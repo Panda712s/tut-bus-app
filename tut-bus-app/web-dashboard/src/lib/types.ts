@@ -125,3 +125,95 @@ export interface AnalyticsOverview {
   feedbackCount: number;
   averageDriverRating: number | null;
 }
+
+// ----- Operations: live fleet wall -----
+
+export interface FleetEntry {
+  tripId: string;
+  tripStatus: 'IN_PROGRESS' | 'PAUSED';
+  startedAt: string | null;
+  bus: {
+    id: string;
+    busNumber: string;
+    plateNumber: string;
+    lat: number | null;
+    lng: number | null;
+    speedKmh: number | null;
+    heading: number | null;
+    capacity: number;
+    passengerCount: number;
+    capacityState: 'EMPTY' | 'MODERATE' | 'FULL';
+  };
+  route: { id: string; name: string };
+  driver: { id: string; fullName: string; phone?: string | null };
+  fixAgeSeconds: number | null;
+  gpsStale: boolean;
+  offRoute: { alertId: string; distanceMeters: number; since: string } | null;
+}
+
+export interface FleetSnapshot {
+  generatedAt: string;
+  activeTripCount: number;
+  openDeviationCount: number;
+  activeSosCount: number;
+  gpsStaleCount: number;
+  buses: FleetEntry[];
+}
+
+export interface DeviationAlert {
+  id: string;
+  status: 'OPEN' | 'CLEARED';
+  lat: number;
+  lng: number;
+  distanceMeters: number;
+  createdAt: string;
+  clearedAt: string | null;
+  tripId: string;
+  busId: string;
+  bus: { busNumber: string };
+  trip: { id: string; driver: { fullName: string }; route: { name: string } };
+}
+
+// ----- Safety: SOS alerts -----
+
+export interface SosAlert {
+  id: string;
+  status: 'ACTIVE' | 'ACKNOWLEDGED' | 'RESOLVED';
+  lat: number | null;
+  lng: number | null;
+  note: string | null;
+  createdAt: string;
+  acknowledgedAt: string | null;
+  resolvedAt: string | null;
+  raisedBy: { kind: 'STUDENT' | 'DRIVER' | 'UNKNOWN'; name: string | null; ref: string | null; phone: string | null };
+  trip: { id: string; status: string; busNumber: string | null; routeName: string | null } | null;
+}
+
+// ----- Ratings -----
+
+export interface TripRatingItem {
+  id: string;
+  direction: 'STUDENT_TO_DRIVER' | 'DRIVER_TO_TRIP';
+  score: number;
+  tags: string[];
+  comment: string | null;
+  createdAt: string;
+  student?: { fullName: string; studentNumber: string } | null;
+  driver?: { fullName: string } | null;
+  trip?: { id: string; route: { name: string } } | null;
+}
+
+// ----- ETA -----
+
+export interface RouteEtaBus {
+  busId: string;
+  busNumber: string;
+  routeId: string;
+  lat: number;
+  lng: number;
+  speedKmh: number | null;
+  capacityState: 'EMPTY' | 'MODERATE' | 'FULL';
+  passengerCount: number;
+  fixAgeSeconds: number;
+  stops: { stopId: string; stopName: string; order: number; distanceMeters: number; etaSeconds: number; etaAt: string }[];
+}

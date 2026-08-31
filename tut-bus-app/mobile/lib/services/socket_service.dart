@@ -37,6 +37,7 @@ class GpsSocketService {
 class NotificationsSocketService {
   NotificationsSocketService({TokenStorage? tokenStorage}) : _tokenStorage = tokenStorage ?? TokenStorage();
 
+  // ignore: unused_field
   final TokenStorage _tokenStorage;
   io.Socket? _socket;
 
@@ -56,6 +57,12 @@ class NotificationsSocketService {
     _socket?.on('notification:new', (data) => handler(Map<String, dynamic>.from(data as Map)));
   }
 
+  /// Fired when the bus the rider is watching reaches one of the route's
+  /// stops (geofenced arrival) - drives the "arriving now" banner.
+  void onStopArrival(void Function(Map<String, dynamic> data) handler) {
+    _socket?.on('stop:arrival', (data) => handler(Map<String, dynamic>.from(data as Map)));
+  }
+
   void dispose() {
     _socket?.dispose();
     _socket = null;
@@ -64,11 +71,23 @@ class NotificationsSocketService {
 
 /// Publishing side, used only by the driver app while a trip is active.
 /// Connects with the driver's JWT so the backend can attribute GPS pings.
+///
+/// If the socket is offline when [publish] is called, the ping is buffered
+/// locally (each stamped with its own `recordedAt`) and the whole queue is
+/// flushed with a single `gps:flush` the moment the connection returns -
+/// so the live map never "teleports" after a signal drop.
 class DriverGpsPublisher {
   DriverGpsPublisher({TokenStorage? tokenStorage}) : _tokenStorage = tokenStorage ?? TokenStorage();
 
   final TokenStorage _tokenStorage;
   io.Socket? _socket;
+
+  static const int _maxBuffered = 500;
+  final List<Map<String, dynamic>> _pending = [];
+  bool _connected = false;
+
+  int get pendingCount => _pending.length;
+  bool get isConnected => _connected;
 
   Future<io.Socket> connect() async {
     final token = await _tokenStorage.getAccessToken();
@@ -80,8 +99,17 @@ class DriverGpsPublisher {
           .setAuth({'token': token})
           .build(),
     );
+    _socket!
+      ..onConnect((_) {
+        _connected = true;
+        _flush();
+      })
+      ..onDisconnect((_) => _connected = false);
+
     if (_socket!.disconnected) {
       _socket!.connect();
+    } else {
+      _connected = _socket!.connected;
     }
     return _socket!;
   }
@@ -94,18 +122,37 @@ class DriverGpsPublisher {
     double? speedKmh,
     double? heading,
   }) {
-    _socket?.emit('gps:update', {
+    final ping = <String, dynamic>{
       'busId': busId,
       if (tripId != null) 'tripId': tripId,
       'lat': lat,
       'lng': lng,
       if (speedKmh != null) 'speedKmh': speedKmh,
       if (heading != null) 'heading': heading,
-    });
+      'recordedAt': DateTime.now().toUtc().toIso8601String(),
+    };
+
+    if (_connected && _socket != null) {
+      _socket!.emit('gps:update', ping);
+    } else {
+      _pending.add(ping);
+      if (_pending.length > _maxBuffered) {
+        _pending.removeRange(0, _pending.length - _maxBuffered);
+      }
+    }
+  }
+
+  void _flush() {
+    if (_pending.isEmpty || _socket == null || !_connected) return;
+    final batch = List<Map<String, dynamic>>.from(_pending);
+    _pending.clear();
+    _socket!.emit('gps:flush', {'pings': batch});
   }
 
   void dispose() {
     _socket?.dispose();
     _socket = null;
+    _pending.clear();
+    _connected = false;
   }
 }

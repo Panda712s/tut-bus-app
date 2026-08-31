@@ -17,6 +17,11 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { GpsModule } from './gps/gps.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { EtaModule } from './eta/eta.module';
+import { TrackingModule } from './tracking/tracking.module';
+import { SafetyModule } from './safety/safety.module';
+import { OpsModule } from './ops/ops.module';
+import { RatingsModule } from './ratings/ratings.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -39,6 +44,11 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     FeedbackModule,
     GpsModule,
     AnalyticsModule,
+    EtaModule,
+    TrackingModule,
+    SafetyModule,
+    OpsModule,
+    RatingsModule,
   ],
   providers: [
     // Every route requires a valid JWT unless explicitly marked with @Public().

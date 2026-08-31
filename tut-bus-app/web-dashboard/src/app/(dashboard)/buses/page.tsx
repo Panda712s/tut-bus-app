@@ -51,7 +51,7 @@ export default function BusesPage() {
           <h1 className="text-2xl font-semibold text-slate-900">Buses</h1>
           <p className="text-sm text-slate-500">Fleet inventory, route assignment, and live capacity.</p>
         </div>
-        <button onClick={() => setOpen(true)} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+        <button onClick={() => setOpen(true)} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
           + Add bus
         </button>
       </div>
@@ -117,7 +117,7 @@ export default function BusesPage() {
               ))}
             </Select>
           </Field>
-          <button type="submit" className="mt-2 w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+          <button type="submit" className="mt-2 w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
             Create bus
           </button>
         </form>

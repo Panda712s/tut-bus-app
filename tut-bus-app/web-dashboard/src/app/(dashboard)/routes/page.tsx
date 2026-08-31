@@ -72,7 +72,7 @@ export default function RoutesPage() {
           <h1 className="text-2xl font-semibold text-slate-900">Routes & Stops</h1>
           <p className="text-sm text-slate-500">The campus routes listed in the project spec, editable here.</p>
         </div>
-        <button onClick={() => setOpen(true)} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+        <button onClick={() => setOpen(true)} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
           + Add route
         </button>
       </div>
@@ -121,7 +121,7 @@ export default function RoutesPage() {
           <Field label="Estimated duration (minutes, optional)">
             <Input type="number" value={form.estimatedDurationMin} onChange={(e) => setForm({ ...form, estimatedDurationMin: e.target.value })} />
           </Field>
-          <button type="submit" className="mt-2 w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+          <button type="submit" className="mt-2 w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
             Create route
           </button>
         </form>
@@ -146,7 +146,7 @@ export default function RoutesPage() {
           <Input required type="number" step="any" placeholder="Latitude" value={stopForm.lat} onChange={(e) => setStopForm({ ...stopForm, lat: e.target.value })} />
           <Input required type="number" step="any" placeholder="Longitude" value={stopForm.lng} onChange={(e) => setStopForm({ ...stopForm, lng: e.target.value })} />
           <Input type="number" placeholder="Order (optional)" value={stopForm.order} onChange={(e) => setStopForm({ ...stopForm, order: e.target.value })} />
-          <button type="submit" className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+          <button type="submit" className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
             Add stop
           </button>
         </form>

@@ -2,13 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  height: 100%;
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* One consistent keyboard-focus ring across every interactive element. */
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [tabindex] {
+    @apply outline-none;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    @apply ring-2 ring-brand-500 ring-offset-2 ring-offset-white rounded-lg;
+  }
+
+  button:not(:disabled) {
+    @apply transition-colors duration-150;
+    cursor: pointer;
+  }
+
+  ::selection {
+    @apply bg-brand-500/20;
+  }
+
+  /* Quiet, consistent scrollbars. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full border-2 border-solid border-transparent bg-slate-300 bg-clip-content;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400 bg-clip-content;
+  }
 }
 
-body {
-  @apply bg-slate-50 text-slate-900;
+@layer components {
+  /* Data-table rows get a subtle hover wash on every page. */
+  tbody tr {
+    @apply transition-colors duration-150;
+  }
+
+  tbody tr:hover {
+    @apply bg-slate-50/70;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .leaflet-container {

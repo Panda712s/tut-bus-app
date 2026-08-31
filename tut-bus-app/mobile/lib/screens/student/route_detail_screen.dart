@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/transport_models.dart';
 import '../../services/transport_repository.dart';
+import '../../services/eta_repository.dart';
 import '../../widgets/state_views.dart';
 import 'board_trip_screen.dart';
 
@@ -17,8 +18,10 @@ class RouteDetailScreen extends StatefulWidget {
 
 class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTickerProviderStateMixin {
   final _repo = TransportRepository();
+  final _etaRepo = EtaRepository();
   BusRoute? _route;
   List<LiveBus> _liveBuses = [];
+  List<RouteEtaBus> _etas = [];
   bool _isFavourite = false;
   bool _loading = true;
   late final TabController _tabController;
@@ -54,6 +57,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
         _liveBuses = results[1] as List<LiveBus>;
         _isFavourite = (results[2] as List<BusRoute>).any((r) => r.id == widget.routeId);
       });
+      _etaRepo.forRoute(widget.routeId).then((e) {
+        if (mounted) setState(() => _etas = e);
+      }).catchError((_) {});
       await _loadSchedule(_dayTypes[0]);
     } catch (_) {
       // keep whatever loaded successfully
@@ -125,6 +131,57 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
               ],
             ),
           ),
+          if (_etas.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Card(
+                elevation: 0,
+                color: const Color(0xFFEFF6FF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: Color(0xFFBFDBFE)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.schedule_rounded, size: 18, color: Color(0xFF1E63E0)),
+                          SizedBox(width: 6),
+                          Text('Next arrivals', style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E3A8A))),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ..._etas.expand((bus) {
+                        final next = bus.stops.isNotEmpty ? bus.stops.first : null;
+                        if (next == null) return <Widget>[];
+                        return <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 3),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    '${bus.busNumber} → ${next.stopName}',
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                ),
+                                Text(
+                                  next.label,
+                                  style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E3A8A)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ];
+                      }),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           if (_liveBuses.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),

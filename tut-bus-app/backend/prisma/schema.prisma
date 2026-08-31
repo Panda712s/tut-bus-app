@@ -88,64 +88,90 @@ enum ReportType {
   OTHER
 }
 
+enum StopEventType {
+  ARRIVED
+  DEPARTED
+}
+
+enum SosStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum DeviationStatus {
+  OPEN
+  CLEARED
+}
+
+enum RatingDirection {
+  STUDENT_TO_DRIVER
+  DRIVER_TO_TRIP
+}
+
 // ---------- Core users ----------
 
 model Student {
-  id               String   @id @default(uuid())
-  studentNumber    String   @unique
-  fullName         String
-  email            String   @unique
-  password         String
-  phone            String?
-  profileImageUrl  String?
-  emailVerified    Boolean  @default(false)
-  isActive         Boolean  @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              String   @id @default(uuid())
+  studentNumber   String   @unique
+  fullName        String
+  email           String   @unique
+  password        String
+  phone           String?
+  profileImageUrl String?
+  emailVerified   Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  favouriteRoutes  FavouriteRoute[]
-  favouriteStops   FavouriteStop[]
-  feedbacks        Feedback[]
-  tripHistories    TripHistory[]
-  notifications    NotificationRecipient[]
-  otpCodes         OtpCode[]
+  favouriteRoutes FavouriteRoute[]
+  favouriteStops  FavouriteStop[]
+  feedbacks       Feedback[]
+  tripHistories   TripHistory[]
+  notifications   NotificationRecipient[]
+  otpCodes        OtpCode[]
+  sosAlerts       SosAlert[]
+  tripShares      TripShare[]
+  tripRatings     TripRating[]
 
   @@map("students")
 }
 
 model Driver {
-  id               String       @id @default(uuid())
-  employeeNumber   String       @unique
-  fullName         String
-  email            String       @unique
-  password         String
-  phone            String?
-  licenseNumber    String       @unique
-  profileImageUrl  String?
-  status           DriverStatus @default(ACTIVE)
-  isActive         Boolean      @default(true)
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  id              String       @id @default(uuid())
+  employeeNumber  String       @unique
+  fullName        String
+  email           String       @unique
+  password        String
+  phone           String?
+  licenseNumber   String       @unique
+  profileImageUrl String?
+  status          DriverStatus @default(ACTIVE)
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
-  assignedBusId    String?
-  assignedBus      Bus?         @relation("BusCurrentDriver", fields: [assignedBusId], references: [id])
+  assignedBusId String?
+  assignedBus   Bus?    @relation("BusCurrentDriver", fields: [assignedBusId], references: [id])
 
-  trips            Trip[]
-  incidentReports  IncidentReport[]
-  notifications    NotificationRecipient[]
+  trips           Trip[]
+  incidentReports IncidentReport[]
+  notifications   NotificationRecipient[]
+  sosAlerts       SosAlert[]
+  tripRatings     TripRating[]
 
   @@map("drivers")
 }
 
 model Admin {
-  id           String    @id @default(uuid())
-  fullName     String
-  email        String    @unique
-  password     String
-  role         AdminRole @default(ADMIN)
-  isActive     Boolean   @default(true)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id        String    @id @default(uuid())
+  fullName  String
+  email     String    @unique
+  password  String
+  role      AdminRole @default(ADMIN)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   notificationsSent Notification[]
 
@@ -153,15 +179,15 @@ model Admin {
 }
 
 model OtpCode {
-  id         String   @id @default(uuid())
-  code       String
-  purpose    String   // "EMAIL_VERIFICATION" | "PASSWORD_RESET" | "LOGIN"
-  expiresAt  DateTime
-  consumed   Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id        String   @id @default(uuid())
+  code      String
+  purpose   String // "EMAIL_VERIFICATION" | "PASSWORD_RESET" | "LOGIN"
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  createdAt DateTime @default(now())
 
-  studentId  String
-  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@map("otp_codes")
@@ -170,65 +196,68 @@ model OtpCode {
 // ---------- Buses, routes, stops ----------
 
 model Bus {
-  id               String            @id @default(uuid())
-  busNumber        String            @unique
-  plateNumber      String            @unique
-  capacity         Int               @default(60)
-  status           BusStatus         @default(ACTIVE)
-  capacityState    BusCapacityState  @default(EMPTY)
-  passengerCount   Int               @default(0)
+  id             String           @id @default(uuid())
+  busNumber      String           @unique
+  plateNumber    String           @unique
+  capacity       Int              @default(60)
+  status         BusStatus        @default(ACTIVE)
+  capacityState  BusCapacityState @default(EMPTY)
+  passengerCount Int              @default(0)
 
   // Live GPS snapshot (updated on every GPS ping for fast reads)
-  currentLat       Float?
-  currentLng       Float?
-  heading          Float?
-  speedKmh         Float?
-  lastLocationAt   DateTime?
+  currentLat     Float?
+  currentLng     Float?
+  heading        Float?
+  speedKmh       Float?
+  lastLocationAt DateTime?
 
-  currentRouteId   String?
-  currentRoute     Route?            @relation(fields: [currentRouteId], references: [id])
+  currentRouteId String?
+  currentRoute   Route?  @relation(fields: [currentRouteId], references: [id])
 
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  currentDriver    Driver[]          @relation("BusCurrentDriver")
-  trips            Trip[]
-  gpsLogs          GpsLog[]
+  currentDriver   Driver[]              @relation("BusCurrentDriver")
+  trips           Trip[]
+  gpsLogs         GpsLog[]
+  deviationAlerts RouteDeviationAlert[]
 
   @@map("buses")
 }
 
 model Route {
-  id                  String   @id @default(uuid())
-  name                String
-  origin              String
+  id                   String   @id @default(uuid())
+  name                 String
+  origin               String
   destination          String
-  distanceKm          Float?
+  distanceKm           Float?
   estimatedDurationMin Int?
-  isActive            Boolean  @default(true)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
-  stops               BusStop[]
-  buses                Bus[]
-  trips               Trip[]
-  schedules           Schedule[]
-  favouritedBy        FavouriteRoute[]
+  stops        BusStop[]
+  buses        Bus[]
+  trips        Trip[]
+  schedules    Schedule[]
+  favouritedBy FavouriteRoute[]
 
   @@map("routes")
 }
 
 model BusStop {
-  id        String  @id @default(uuid())
-  name      String
-  lat       Float
-  lng       Float
-  order     Int     @default(0)
+  id           String @id @default(uuid())
+  name         String
+  lat          Float
+  lng          Float
+  order        Int    @default(0)
+  radiusMeters Int    @default(60) // geofence radius for automatic arrival detection
 
-  routeId   String
-  route     Route   @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  routeId String
+  route   Route  @relation(fields: [routeId], references: [id], onDelete: Cascade)
 
   favouritedBy FavouriteStop[]
+  stopEvents   TripStopEvent[]
 
   @@index([routeId])
   @@map("bus_stops")
@@ -237,27 +266,34 @@ model BusStop {
 // ---------- Trips & schedules ----------
 
 model Trip {
-  id              String     @id @default(uuid())
-  status          TripStatus @default(SCHEDULED)
-  startedAt       DateTime?
-  endedAt         DateTime?
-  passengerCount  Int        @default(0)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id             String     @id @default(uuid())
+  status         TripStatus @default(SCHEDULED)
+  startedAt      DateTime?
+  endedAt        DateTime?
+  passengerCount Int        @default(0)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 
-  busId           String
-  bus             Bus        @relation(fields: [busId], references: [id])
+  lastKnownStopId String? // last bus stop the bus was detected at (geofence)
 
-  driverId        String
-  driver          Driver     @relation(fields: [driverId], references: [id])
+  busId String
+  bus   Bus    @relation(fields: [busId], references: [id])
 
-  routeId         String
-  route           Route      @relation(fields: [routeId], references: [id])
+  driverId String
+  driver   Driver @relation(fields: [driverId], references: [id])
+
+  routeId String
+  route   Route  @relation(fields: [routeId], references: [id])
 
   gpsLogs         GpsLog[]
   tripHistories   TripHistory[]
   incidentReports IncidentReport[]
   feedbacks       Feedback[]
+  stopEvents      TripStopEvent[]
+  sosAlerts       SosAlert[]
+  shares          TripShare[]
+  deviationAlerts RouteDeviationAlert[]
+  ratings         TripRating[]
 
   @@index([busId])
   @@index([driverId])
@@ -266,15 +302,15 @@ model Trip {
 }
 
 model Schedule {
-  id             String         @id @default(uuid())
-  dayType        DayType
-  period         SchedulePeriod
-  departureTime  String         // "HH:mm" 24h format
-  isActive       Boolean        @default(true)
-  createdAt      DateTime       @default(now())
+  id            String         @id @default(uuid())
+  dayType       DayType
+  period        SchedulePeriod
+  departureTime String // "HH:mm" 24h format
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
 
-  routeId        String
-  route          Route          @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  routeId String
+  route   Route  @relation(fields: [routeId], references: [id], onDelete: Cascade)
 
   @@index([routeId])
   @@map("schedules")
@@ -283,18 +319,18 @@ model Schedule {
 // ---------- GPS ----------
 
 model GpsLog {
-  id          String   @id @default(uuid())
-  lat         Float
-  lng         Float
-  speedKmh    Float?
-  heading     Float?
-  recordedAt  DateTime @default(now())
+  id         String   @id @default(uuid())
+  lat        Float
+  lng        Float
+  speedKmh   Float?
+  heading    Float?
+  recordedAt DateTime @default(now())
 
-  busId       String
-  bus         Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+  busId String
+  bus   Bus    @relation(fields: [busId], references: [id], onDelete: Cascade)
 
-  tripId      String?
-  trip        Trip?    @relation(fields: [tripId], references: [id])
+  tripId String?
+  trip   Trip?   @relation(fields: [tripId], references: [id])
 
   @@index([busId, recordedAt])
   @@map("gps_logs")
@@ -303,35 +339,35 @@ model GpsLog {
 // ---------- Notifications ----------
 
 model Notification {
-  id          String                @id @default(uuid())
-  title       String
-  body        String
-  type        NotificationType      @default(GENERAL)
-  audience    NotificationAudience  @default(ALL_STUDENTS)
-  routeId     String?
-  createdAt   DateTime              @default(now())
+  id        String               @id @default(uuid())
+  title     String
+  body      String
+  type      NotificationType     @default(GENERAL)
+  audience  NotificationAudience @default(ALL_STUDENTS)
+  routeId   String?
+  createdAt DateTime             @default(now())
 
-  sentById    String?
-  sentBy      Admin?                @relation(fields: [sentById], references: [id])
+  sentById String?
+  sentBy   Admin?  @relation(fields: [sentById], references: [id])
 
-  recipients  NotificationRecipient[]
+  recipients NotificationRecipient[]
 
   @@map("notifications")
 }
 
 model NotificationRecipient {
-  id              String       @id @default(uuid())
-  read            Boolean      @default(false)
-  readAt          DateTime?
+  id     String    @id @default(uuid())
+  read   Boolean   @default(false)
+  readAt DateTime?
 
-  notificationId  String
-  notification    Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
 
-  studentId       String?
-  student         Student?     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String?
+  student   Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  driverId        String?
-  driver          Driver?      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  driverId String?
+  driver   Driver? @relation(fields: [driverId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([driverId])
@@ -341,17 +377,17 @@ model NotificationRecipient {
 // ---------- Feedback & incident reports ----------
 
 model Feedback {
-  id          String            @id @default(uuid())
-  category    FeedbackCategory  @default(DRIVER_RATING)
-  rating      Int?              // 1-5, used for DRIVER_RATING
-  comment     String?
-  createdAt   DateTime          @default(now())
+  id        String           @id @default(uuid())
+  category  FeedbackCategory @default(DRIVER_RATING)
+  rating    Int? // 1-5, used for DRIVER_RATING
+  comment   String?
+  createdAt DateTime         @default(now())
 
-  studentId   String
-  student     Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  tripId      String?
-  trip        Trip?             @relation(fields: [tripId], references: [id])
+  tripId String?
+  trip   Trip?   @relation(fields: [tripId], references: [id])
 
   @@index([studentId])
   @@map("feedback")
@@ -364,11 +400,11 @@ model IncidentReport {
   createdAt   DateTime   @default(now())
   resolvedAt  DateTime?
 
-  driverId    String
-  driver      Driver     @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  driverId String
+  driver   Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
 
-  tripId      String?
-  trip        Trip?      @relation(fields: [tripId], references: [id])
+  tripId String?
+  trip   Trip?   @relation(fields: [tripId], references: [id])
 
   @@index([driverId])
   @@map("incident_reports")
@@ -377,16 +413,16 @@ model IncidentReport {
 // ---------- Trip history & favourites (student-facing) ----------
 
 model TripHistory {
-  id           String    @id @default(uuid())
-  boardedAt    DateTime  @default(now())
-  alightedAt   DateTime?
-  qrScanned    Boolean   @default(false)
+  id         String    @id @default(uuid())
+  boardedAt  DateTime  @default(now())
+  alightedAt DateTime?
+  qrScanned  Boolean   @default(false)
 
-  studentId    String
-  student      Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  tripId       String
-  trip         Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([tripId])
@@ -394,29 +430,133 @@ model TripHistory {
 }
 
 model FavouriteRoute {
-  id         String   @id @default(uuid())
-  createdAt  DateTime @default(now())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
 
-  studentId  String
-  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  routeId    String
-  route      Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  routeId String
+  route   Route  @relation(fields: [routeId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, routeId])
   @@map("favourite_routes")
 }
 
 model FavouriteStop {
-  id         String   @id @default(uuid())
-  createdAt  DateTime @default(now())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
 
-  studentId  String
-  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  stopId     String
-  stop       BusStop  @relation(fields: [stopId], references: [id], onDelete: Cascade)
+  stopId String
+  stop   BusStop @relation(fields: [stopId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, stopId])
   @@map("favourite_stops")
+}
+
+// ---------- Geofenced stop arrivals (feature: automatic arrival detection) ----------
+
+model TripStopEvent {
+  id         String        @id @default(uuid())
+  type       StopEventType
+  occurredAt DateTime      @default(now())
+
+  tripId String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  stopId String
+  stop   BusStop @relation(fields: [stopId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+  @@index([stopId])
+  @@map("trip_stop_events")
+}
+
+// ---------- SOS alerts & trip sharing (feature: safety) ----------
+
+model SosAlert {
+  id             String    @id @default(uuid())
+  status         SosStatus @default(ACTIVE)
+  lat            Float?
+  lng            Float?
+  note           String?
+  createdAt      DateTime  @default(now())
+  acknowledgedAt DateTime?
+  resolvedAt     DateTime?
+
+  raisedByStudentId String?
+  raisedByStudent   Student? @relation(fields: [raisedByStudentId], references: [id], onDelete: SetNull)
+
+  raisedByDriverId String?
+  raisedByDriver   Driver? @relation(fields: [raisedByDriverId], references: [id], onDelete: SetNull)
+
+  tripId String?
+  trip   Trip?   @relation(fields: [tripId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@map("sos_alerts")
+}
+
+model TripShare {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+
+  tripId String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  createdByStudentId String?
+  createdByStudent   Student? @relation(fields: [createdByStudentId], references: [id], onDelete: SetNull)
+
+  @@index([tripId])
+  @@map("trip_shares")
+}
+
+// ---------- Route deviation alerts (feature: admin fleet wall / off-route) ----------
+
+model RouteDeviationAlert {
+  id             String          @id @default(uuid())
+  status         DeviationStatus @default(OPEN)
+  lat            Float
+  lng            Float
+  distanceMeters Float
+  createdAt      DateTime        @default(now())
+  clearedAt      DateTime?
+
+  tripId String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  busId String
+  bus   Bus    @relation(fields: [busId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("route_deviation_alerts")
+}
+
+// ---------- Two-way trip ratings (feature: structured ratings) ----------
+
+model TripRating {
+  id        String          @id @default(uuid())
+  direction RatingDirection
+  score     Int // 1-5
+  tags      String[]
+  comment   String?
+  createdAt DateTime        @default(now())
+
+  tripId String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  studentId String?
+  student   Student? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+
+  driverId String?
+  driver   Driver? @relation(fields: [driverId], references: [id], onDelete: SetNull)
+
+  @@index([tripId])
+  @@map("trip_ratings")
 }

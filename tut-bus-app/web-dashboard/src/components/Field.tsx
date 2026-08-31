@@ -1,5 +1,8 @@
 import { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from 'react';
 
+const CONTROL_CLASS =
+  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition-colors duration-150 placeholder:text-slate-400 hover:border-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400';
+
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="mb-3">
@@ -10,19 +13,9 @@ export function Field({ label, children }: { label: string; children: ReactNode 
 }
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      {...props}
-      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-    />
-  );
+  return <input {...props} className={CONTROL_CLASS} />;
 }
 
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select
-      {...props}
-      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-    />
-  );
+  return <select {...props} className={CONTROL_CLASS} />;
 }

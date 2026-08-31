@@ -68,7 +68,7 @@ class _HomeTabState extends State<HomeTab> {
                     children: [
                       Text(
                         'Hi, ${_profile?.fullName.split(' ').first ?? 'there'} 👋',
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: -0.3),
                       ),
                       const SizedBox(height: 4),
                       const Text('Here is what is happening on campus transport today.', style: TextStyle(color: Colors.black54)),
@@ -86,6 +86,11 @@ class _HomeTabState extends State<HomeTab> {
                         ..._nearbyBuses.map(
                           (bus) => Card(
                             margin: const EdgeInsets.only(bottom: 8),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Color(0xFFE2E8F0)),
+                            ),
                             child: ListTile(
                               leading: const Icon(Icons.directions_bus_filled_rounded, color: Color(0xFF1E63E0)),
                               title: Text(bus.busNumber),
@@ -106,6 +111,11 @@ class _HomeTabState extends State<HomeTab> {
                         ..._favourites.map(
                           (route) => Card(
                             margin: const EdgeInsets.only(bottom: 8),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Color(0xFFE2E8F0)),
+                            ),
                             child: ListTile(
                               leading: const Icon(Icons.star_rounded, color: Colors.amber),
                               title: Text(route.name),
@@ -128,8 +138,15 @@ class _WeatherAnnouncementCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF1E63E0), Color(0xFF194FB5)]),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E63E0), Color(0xFF194FB5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Color(0x331E63E0), blurRadius: 16, offset: Offset(0, 6)),
+        ],
       ),
       child: const Row(
         children: [

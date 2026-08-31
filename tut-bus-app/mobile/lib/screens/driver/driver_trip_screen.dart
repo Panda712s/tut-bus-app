@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../services/driver_repository.dart';
 import '../../services/location_service.dart';
+import '../../services/safety_repository.dart';
 import '../../services/socket_service.dart';
 import '../../widgets/primary_button.dart';
+import '../../widgets/rating_sheet.dart';
+import '../../widgets/sos_button.dart';
 import 'driver_incident_screen.dart';
 
 class DriverTripScreen extends StatefulWidget {
@@ -21,11 +24,13 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
   final _driverRepo = DriverRepository();
   final _locationService = LocationService();
   final _gpsPublisher = DriverGpsPublisher();
+  final _safety = SafetyRepository();
 
   late String _tripId = widget.trip['id'] as String;
   late String _status = widget.trip['status'] as String;
   int _passengerCount = 0;
   StreamSubscription<Position>? _positionSub;
+  Timer? _statusTicker;
   Position? _lastPosition;
   bool _sharingLocation = false;
   bool _busy = false;
@@ -34,6 +39,10 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
   void initState() {
     super.initState();
     _startSharingIfPossible();
+    // Keep the "queued pings" indicator fresh while offline.
+    _statusTicker = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (mounted) setState(() {});
+    });
   }
 
   Future<void> _startSharingIfPossible() async {
@@ -63,6 +72,7 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
 
   @override
   void dispose() {
+    _statusTicker?.cancel();
     _positionSub?.cancel();
     _gpsPublisher.dispose();
     super.dispose();
@@ -85,7 +95,31 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
     );
     if (confirmed != true) return;
     await _runAction(() => _driverRepo.endTrip(_tripId), newStatus: 'COMPLETED');
+    if (!mounted) return;
+    await showRatingSheet(context, tripId: _tripId, isDriver: true);
     if (mounted) Navigator.of(context).pop();
+  }
+
+  Future<void> _shareTrip() async {
+    try {
+      final link = await _safety.createShare(tripId: _tripId);
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Trip link created'),
+          content: Text(
+            'Anyone with this link can follow the bus until it expires '
+            '(${TimeOfDay.fromDateTime(link.expiresAt).format(ctx)}).\n\n${link.path}',
+          ),
+          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Done'))],
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not create link: $e')));
+      }
+    }
   }
 
   Future<void> _runAction(Future<void> Function() action, {required String newStatus}) async {
@@ -113,7 +147,20 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Active Trip')),
+      appBar: AppBar(
+        title: const Text('Active Trip'),
+        actions: [
+          IconButton(
+            tooltip: 'Share this trip',
+            onPressed: _shareTrip,
+            icon: const Icon(Icons.ios_share_rounded),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: SosButton(tripId: _tripId, compact: true),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -143,6 +190,20 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
                         child: Text(
                           'Last fix: ${_lastPosition!.latitude.toStringAsFixed(5)}, ${_lastPosition!.longitude.toStringAsFixed(5)}',
                           style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        ),
+                      ),
+                    if (_gpsPublisher.pendingCount > 0)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.cloud_off_rounded, size: 16, color: Color(0xFFB45309)),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${_gpsPublisher.pendingCount} fixes queued — will sync when back online',
+                              style: const TextStyle(fontSize: 12, color: Color(0xFFB45309)),
+                            ),
+                          ],
                         ),
                       ),
                   ],

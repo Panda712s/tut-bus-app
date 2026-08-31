@@ -4,7 +4,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Public } from '../common/decorators/public.decorator';
 import { Role } from '../common/enums/role.enum';
 import { GpsService } from './gps.service';
-import { GpsUpdateDto } from './dto/gps-update.dto';
+import { GpsUpdateDto, GpsBatchDto } from './dto/gps-update.dto';
 
 /**
  * REST fallback for GPS pings (useful for testing with curl/Postman, or a
@@ -20,6 +20,14 @@ export class GpsController {
   @Roles(Role.DRIVER)
   ping(@Body() dto: GpsUpdateDto) {
     return this.gps.recordPing(dto);
+  }
+
+  /** Flush a queue of pings buffered by the driver app while offline. */
+  @Post('ping/batch')
+  @UseGuards(RolesGuard)
+  @Roles(Role.DRIVER)
+  pingBatch(@Body() dto: GpsBatchDto) {
+    return this.gps.recordPingBatch(dto.pings);
   }
 
   @Public()

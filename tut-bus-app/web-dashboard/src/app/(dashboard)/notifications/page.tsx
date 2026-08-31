@@ -88,7 +88,7 @@ export default function NotificationsPage() {
                 </Select>
               </Field>
             )}
-            <button type="submit" className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+            <button type="submit" className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
               Send notification
             </button>
           </form>

@@ -51,7 +51,7 @@ export default function DriversPage() {
           <h1 className="text-2xl font-semibold text-slate-900">Drivers</h1>
           <p className="text-sm text-slate-500">Onboard and manage bus drivers.</p>
         </div>
-        <button onClick={() => setOpen(true)} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+        <button onClick={() => setOpen(true)} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
           + Add driver
         </button>
       </div>
@@ -116,7 +116,7 @@ export default function DriversPage() {
           <Field label="Phone (optional)">
             <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </Field>
-          <button type="submit" className="mt-2 w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+          <button type="submit" className="mt-2 w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
             Create driver
           </button>
         </form>

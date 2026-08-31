@@ -11,7 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GpsService } from './gps.service';
-import { GpsUpdateDto } from './dto/gps-update.dto';
+import { GpsUpdateDto, GpsBatchDto } from './dto/gps-update.dto';
 
 /**
  * Real-time GPS channel.
@@ -78,5 +78,19 @@ export class GpsGateway implements OnGatewayConnection {
     if (bus.currentRouteId) {
       this.server.to(`route:${bus.currentRouteId}`).emit('bus:location', payload);
     }
+  }
+
+  /**
+   * Driver app reconnected after being offline and is flushing the pings it
+   * buffered locally. Each ping carries its own `recordedAt`.
+   */
+  @SubscribeMessage('gps:flush')
+  async handleGpsFlush(@ConnectedSocket() client: Socket, @MessageBody() body: GpsBatchDto) {
+    if (!client.data.driverId) {
+      client.emit('gps:error', { message: 'Unauthorized: driver token required to publish GPS updates' });
+      return;
+    }
+    const result = await this.gpsService.recordPingBatch(body.pings ?? []);
+    client.emit('gps:flush-ack', result);
   }
 }
