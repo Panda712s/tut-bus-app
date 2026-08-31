@@ -1,0 +1,422 @@
+// TUT Bus App - Prisma schema
+// Mirrors "11. Database Design" in the project documentation.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Enums ----------
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
+enum DriverStatus {
+  ACTIVE
+  INACTIVE
+  ON_TRIP
+  SUSPENDED
+}
+
+enum BusStatus {
+  ACTIVE
+  MAINTENANCE
+  INACTIVE
+}
+
+enum BusCapacityState {
+  EMPTY
+  MODERATE
+  FULL
+}
+
+enum TripStatus {
+  SCHEDULED
+  IN_PROGRESS
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum DayType {
+  WEEKDAY
+  WEEKEND
+  HOLIDAY
+}
+
+enum SchedulePeriod {
+  MORNING
+  AFTERNOON
+  EVENING
+}
+
+enum NotificationType {
+  BUS_ARRIVAL
+  BUS_DEPARTURE
+  DELAY_ALERT
+  ROUTE_CHANGE
+  WEATHER_ALERT
+  EMERGENCY
+  GENERAL
+}
+
+enum NotificationAudience {
+  ALL_STUDENTS
+  ROUTE_STUDENTS
+  SINGLE_STUDENT
+  ALL_DRIVERS
+  SINGLE_DRIVER
+}
+
+enum FeedbackCategory {
+  DRIVER_RATING
+  ISSUE_REPORT
+  SUGGESTION
+}
+
+enum ReportType {
+  TRAFFIC
+  ACCIDENT
+  BREAKDOWN
+  DELAY
+  OTHER
+}
+
+// ---------- Core users ----------
+
+model Student {
+  id               String   @id @default(uuid())
+  studentNumber    String   @unique
+  fullName         String
+  email            String   @unique
+  password         String
+  phone            String?
+  profileImageUrl  String?
+  emailVerified    Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  favouriteRoutes  FavouriteRoute[]
+  favouriteStops   FavouriteStop[]
+  feedbacks        Feedback[]
+  tripHistories    TripHistory[]
+  notifications    NotificationRecipient[]
+  otpCodes         OtpCode[]
+
+  @@map("students")
+}
+
+model Driver {
+  id               String       @id @default(uuid())
+  employeeNumber   String       @unique
+  fullName         String
+  email            String       @unique
+  password         String
+  phone            String?
+  licenseNumber    String       @unique
+  profileImageUrl  String?
+  status           DriverStatus @default(ACTIVE)
+  isActive         Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  assignedBusId    String?
+  assignedBus      Bus?         @relation("BusCurrentDriver", fields: [assignedBusId], references: [id])
+
+  trips            Trip[]
+  incidentReports  IncidentReport[]
+  notifications    NotificationRecipient[]
+
+  @@map("drivers")
+}
+
+model Admin {
+  id           String    @id @default(uuid())
+  fullName     String
+  email        String    @unique
+  password     String
+  role         AdminRole @default(ADMIN)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  notificationsSent Notification[]
+
+  @@map("admins")
+}
+
+model OtpCode {
+  id         String   @id @default(uuid())
+  code       String
+  purpose    String   // "EMAIL_VERIFICATION" | "PASSWORD_RESET" | "LOGIN"
+  expiresAt  DateTime
+  consumed   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("otp_codes")
+}
+
+// ---------- Buses, routes, stops ----------
+
+model Bus {
+  id               String            @id @default(uuid())
+  busNumber        String            @unique
+  plateNumber      String            @unique
+  capacity         Int               @default(60)
+  status           BusStatus         @default(ACTIVE)
+  capacityState    BusCapacityState  @default(EMPTY)
+  passengerCount   Int               @default(0)
+
+  // Live GPS snapshot (updated on every GPS ping for fast reads)
+  currentLat       Float?
+  currentLng       Float?
+  heading          Float?
+  speedKmh         Float?
+  lastLocationAt   DateTime?
+
+  currentRouteId   String?
+  currentRoute     Route?            @relation(fields: [currentRouteId], references: [id])
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  currentDriver    Driver[]          @relation("BusCurrentDriver")
+  trips            Trip[]
+  gpsLogs          GpsLog[]
+
+  @@map("buses")
+}
+
+model Route {
+  id                  String   @id @default(uuid())
+  name                String
+  origin              String
+  destination          String
+  distanceKm          Float?
+  estimatedDurationMin Int?
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  stops               BusStop[]
+  buses                Bus[]
+  trips               Trip[]
+  schedules           Schedule[]
+  favouritedBy        FavouriteRoute[]
+
+  @@map("routes")
+}
+
+model BusStop {
+  id        String  @id @default(uuid())
+  name      String
+  lat       Float
+  lng       Float
+  order     Int     @default(0)
+
+  routeId   String
+  route     Route   @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  favouritedBy FavouriteStop[]
+
+  @@index([routeId])
+  @@map("bus_stops")
+}
+
+// ---------- Trips & schedules ----------
+
+model Trip {
+  id              String     @id @default(uuid())
+  status          TripStatus @default(SCHEDULED)
+  startedAt       DateTime?
+  endedAt         DateTime?
+  passengerCount  Int        @default(0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  busId           String
+  bus             Bus        @relation(fields: [busId], references: [id])
+
+  driverId        String
+  driver          Driver     @relation(fields: [driverId], references: [id])
+
+  routeId         String
+  route           Route      @relation(fields: [routeId], references: [id])
+
+  gpsLogs         GpsLog[]
+  tripHistories   TripHistory[]
+  incidentReports IncidentReport[]
+  feedbacks       Feedback[]
+
+  @@index([busId])
+  @@index([driverId])
+  @@index([routeId])
+  @@map("trips")
+}
+
+model Schedule {
+  id             String         @id @default(uuid())
+  dayType        DayType
+  period         SchedulePeriod
+  departureTime  String         // "HH:mm" 24h format
+  isActive       Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+
+  routeId        String
+  route          Route          @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@index([routeId])
+  @@map("schedules")
+}
+
+// ---------- GPS ----------
+
+model GpsLog {
+  id          String   @id @default(uuid())
+  lat         Float
+  lng         Float
+  speedKmh    Float?
+  heading     Float?
+  recordedAt  DateTime @default(now())
+
+  busId       String
+  bus         Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+
+  tripId      String?
+  trip        Trip?    @relation(fields: [tripId], references: [id])
+
+  @@index([busId, recordedAt])
+  @@map("gps_logs")
+}
+
+// ---------- Notifications ----------
+
+model Notification {
+  id          String                @id @default(uuid())
+  title       String
+  body        String
+  type        NotificationType      @default(GENERAL)
+  audience    NotificationAudience  @default(ALL_STUDENTS)
+  routeId     String?
+  createdAt   DateTime              @default(now())
+
+  sentById    String?
+  sentBy      Admin?                @relation(fields: [sentById], references: [id])
+
+  recipients  NotificationRecipient[]
+
+  @@map("notifications")
+}
+
+model NotificationRecipient {
+  id              String       @id @default(uuid())
+  read            Boolean      @default(false)
+  readAt          DateTime?
+
+  notificationId  String
+  notification    Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  studentId       String?
+  student         Student?     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  driverId        String?
+  driver          Driver?      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([driverId])
+  @@map("notification_recipients")
+}
+
+// ---------- Feedback & incident reports ----------
+
+model Feedback {
+  id          String            @id @default(uuid())
+  category    FeedbackCategory  @default(DRIVER_RATING)
+  rating      Int?              // 1-5, used for DRIVER_RATING
+  comment     String?
+  createdAt   DateTime          @default(now())
+
+  studentId   String
+  student     Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  tripId      String?
+  trip        Trip?             @relation(fields: [tripId], references: [id])
+
+  @@index([studentId])
+  @@map("feedback")
+}
+
+model IncidentReport {
+  id          String     @id @default(uuid())
+  type        ReportType
+  description String?
+  createdAt   DateTime   @default(now())
+  resolvedAt  DateTime?
+
+  driverId    String
+  driver      Driver     @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  tripId      String?
+  trip        Trip?      @relation(fields: [tripId], references: [id])
+
+  @@index([driverId])
+  @@map("incident_reports")
+}
+
+// ---------- Trip history & favourites (student-facing) ----------
+
+model TripHistory {
+  id           String    @id @default(uuid())
+  boardedAt    DateTime  @default(now())
+  alightedAt   DateTime?
+  qrScanned    Boolean   @default(false)
+
+  studentId    String
+  student      Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  tripId       String
+  trip         Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([tripId])
+  @@map("trip_history")
+}
+
+model FavouriteRoute {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  routeId    String
+  route      Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, routeId])
+  @@map("favourite_routes")
+}
+
+model FavouriteStop {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  stopId     String
+  stop       BusStop  @relation(fields: [stopId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, stopId])
+  @@map("favourite_stops")
+}

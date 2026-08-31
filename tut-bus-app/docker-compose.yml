@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: tutbus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tutbus
+      POSTGRES_PASSWORD: tutbus_password
+      POSTGRES_DB: tutbus
+    ports:
+      - "5432:5432"
+    volumes:
+      - tutbus_pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: tutbus-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://tutbus:tutbus_password@postgres:5432/tutbus?schema=public
+      JWT_SECRET: change_me_in_production
+      JWT_REFRESH_SECRET: change_me_too_in_production
+      PORT: 3000
+    ports:
+      - "3000:3000"
+
+  web-dashboard:
+    build:
+      context: ./web-dashboard
+    container_name: tutbus-web-dashboard
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+    ports:
+      - "3001:3000"
+
+volumes:
+  tutbus_pgdata:
