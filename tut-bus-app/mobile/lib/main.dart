@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'l10n/app_l10n.dart';
 import 'models/user_models.dart';
 import 'state/auth_state.dart';
+import 'state/settings_controller.dart';
 import 'theme/app_theme.dart';
 import 'screens/shared/splash_screen.dart';
 import 'screens/auth/role_select_screen.dart';
@@ -11,29 +14,52 @@ import 'screens/driver/driver_shell.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: AppColors.canvas,
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
-  runApp(const TutBusApp());
+  final settings = SettingsController()..load();
+  runApp(TutBusApp(settings: settings));
 }
 
 class TutBusApp extends StatelessWidget {
-  const TutBusApp({super.key});
+  const TutBusApp({super.key, required this.settings});
+
+  final SettingsController settings;
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthState(),
-      child: MaterialApp(
-        title: 'TUT Bus App',
-        debugShowCheckedModeBanner: false,
-        theme: buildAppTheme(),
-        home: const RootRouter(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthState()),
+        ChangeNotifierProvider.value(value: settings),
+      ],
+      child: Consumer<SettingsController>(
+        builder: (context, s, _) {
+          final dark = s.themeMode == ThemeMode.dark ||
+              (s.themeMode == ThemeMode.system &&
+                  WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark);
+          SystemChrome.setSystemUIOverlayStyle(
+            SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
+              systemNavigationBarColor: dark ? AppColors.canvas : const Color(0xFFF6F7FB),
+              systemNavigationBarIconBrightness: dark ? Brightness.light : Brightness.dark,
+            ),
+          );
+          return MaterialApp(
+            title: 'TUT Bus App',
+            debugShowCheckedModeBanner: false,
+            theme: buildAppTheme(Brightness.light),
+            darkTheme: buildAppTheme(Brightness.dark),
+            themeMode: s.themeMode,
+            locale: s.locale,
+            supportedLocales: AppL10n.supportedLocales,
+            localizationsDelegates: const [
+              AppL10n.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            home: const RootRouter(),
+          );
+        },
       ),
     );
   }

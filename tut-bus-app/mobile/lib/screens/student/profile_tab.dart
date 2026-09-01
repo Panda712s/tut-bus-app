@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../models/user_models.dart';
 import '../../services/student_repository.dart';
 import '../../state/auth_state.dart';
+import '../../l10n/app_l10n.dart';
 import '../../widgets/state_views.dart';
+import '../settings/settings_screen.dart';
 import 'trip_history_screen.dart';
 import 'feedback_screen.dart';
 import 'edit_profile_screen.dart';
@@ -58,7 +60,7 @@ class _ProfileTabState extends State<ProfileTab> {
                   child: Text(_profile?.fullName ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                 ),
                 Center(
-                  child: Text(_profile?.studentNumber ?? '', style: const TextStyle(color: Colors.white70)),
+                  child: Text(_profile?.studentNumber ?? '', style: TextStyle(color: Color(0xFF8A90A2))),
                 ),
                 const SizedBox(height: 24),
                 Card(
@@ -95,6 +97,12 @@ class _ProfileTabState extends State<ProfileTab> {
                         title: const Text('Feedback & ratings'),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FeedbackScreen())),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.settings_outlined),
+                        title: Text(AppL10n.of(context).t('common.settings')),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
                       ),
                     ],
                   ),

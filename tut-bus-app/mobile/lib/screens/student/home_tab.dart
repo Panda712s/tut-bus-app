@@ -71,7 +71,7 @@ class _HomeTabState extends State<HomeTab> {
                         style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: -0.3),
                       ),
                       const SizedBox(height: 4),
-                      const Text('Here is what is happening on campus transport today.', style: TextStyle(color: Colors.white70)),
+                      const Text('Here is what is happening on campus transport today.', style: TextStyle(color: Color(0xFF8A90A2))),
                       const SizedBox(height: 20),
                       _WeatherAnnouncementCard(),
                       const SizedBox(height: 24),
@@ -80,7 +80,7 @@ class _HomeTabState extends State<HomeTab> {
                       if (_nearbyBuses.isEmpty)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 8),
-                          child: Text('No buses are currently active.', style: TextStyle(color: Colors.white60)),
+                          child: Text('No buses are currently active.', style: TextStyle(color: Color(0xFF8A90A2))),
                         )
                       else
                         ..._nearbyBuses.map(
@@ -89,7 +89,7 @@ class _HomeTabState extends State<HomeTab> {
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(color: Color(0xFF262B3A)),
+                              side: BorderSide(color: Theme.of(context).dividerColor),
                             ),
                             child: ListTile(
                               leading: const Icon(Icons.directions_bus_filled_rounded, color: Color(0xFF8B5CF6)),
@@ -105,7 +105,7 @@ class _HomeTabState extends State<HomeTab> {
                       if (_favourites.isEmpty)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 8),
-                          child: Text('Star a route from the Routes tab to pin it here.', style: TextStyle(color: Colors.white60)),
+                          child: Text('Star a route from the Routes tab to pin it here.', style: TextStyle(color: Color(0xFF8A90A2))),
                         )
                       else
                         ..._favourites.map(
@@ -114,7 +114,7 @@ class _HomeTabState extends State<HomeTab> {
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(color: Color(0xFF262B3A)),
+                              side: BorderSide(color: Theme.of(context).dividerColor),
                             ),
                             child: ListTile(
                               leading: const Icon(Icons.star_rounded, color: Colors.amber),
@@ -160,7 +160,7 @@ class _WeatherAnnouncementCard extends StatelessWidget {
                 SizedBox(height: 2),
                 Text(
                   'No campus announcements right now.',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                  style: TextStyle(color: const Color(0xFF8A90A2), fontSize: 12),
                 ),
               ],
             ),

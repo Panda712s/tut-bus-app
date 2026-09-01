@@ -263,7 +263,7 @@ class _InfoTile extends StatelessWidget {
     return Column(
       children: [
         Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.white70)),
+        Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF8A90A2))),
       ],
     );
   }

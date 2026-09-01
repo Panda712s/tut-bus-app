@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../models/user_models.dart';
 import '../../services/driver_repository.dart';
 import '../../state/auth_state.dart';
+import '../../l10n/app_l10n.dart';
 import '../../widgets/state_views.dart';
+import '../settings/settings_screen.dart';
 import 'driver_incident_screen.dart';
 
 class DriverProfileTab extends StatefulWidget {
@@ -53,7 +55,7 @@ class _DriverProfileTabState extends State<DriverProfileTab> {
                 ),
                 const SizedBox(height: 12),
                 Center(child: Text(_profile?.fullName ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600))),
-                Center(child: Text(_profile?.employeeNumber ?? '', style: const TextStyle(color: Colors.white70))),
+                Center(child: Text(_profile?.employeeNumber ?? '', style: TextStyle(color: Color(0xFF8A90A2)))),
                 const SizedBox(height: 24),
                 Card(
                   child: Column(
@@ -64,11 +66,27 @@ class _DriverProfileTabState extends State<DriverProfileTab> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                ListTile(
-                  leading: const Icon(Icons.report_problem_outlined),
-                  title: const Text('Report an issue'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DriverIncidentScreen())),
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.report_problem_outlined),
+                        title: const Text('Report an issue'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const DriverIncidentScreen()),
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.settings_outlined),
+                        title: Text(AppL10n.of(context).t('common.settings')),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 24),
                 OutlinedButton.icon(

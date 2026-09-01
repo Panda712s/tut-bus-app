@@ -28,7 +28,7 @@ class RoleSelectScreen extends StatelessWidget {
               const Text(
                 'Smart Campus Bus Tracking and Management System',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(color: Color(0xFF8A90A2)),
               ),
               const SizedBox(height: 40),
               _RoleCard(
@@ -65,9 +65,9 @@ class _RoleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF131620),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF262B3A)),
+        border: Border.all(color: Theme.of(context).dividerColor),
         boxShadow: const [
           BoxShadow(color: Color(0x66000000), blurRadius: 16, offset: Offset(0, 8)),
         ],
@@ -94,11 +94,11 @@ class _RoleCard extends StatelessWidget {
                   children: [
                     Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                     const SizedBox(height: 2),
-                    Text(subtitle, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                    Text(subtitle, style: const TextStyle(color: Color(0xFF8A90A2), fontSize: 13)),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: Colors.white54),
+              const Icon(Icons.chevron_right_rounded, color: Color(0xFF8A90A2)),
             ],
           ),
         ),

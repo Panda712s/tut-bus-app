@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_l10n.dart';
 import '../../state/auth_state.dart';
 import '../../services/socket_service.dart';
 import '../../widgets/sos_button.dart';
@@ -69,16 +70,27 @@ class _StudentShellState extends State<StudentShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.map_outlined), selectedIcon: Icon(Icons.map), label: 'Live Map'),
-          NavigationDestination(icon: Icon(Icons.alt_route_outlined), selectedIcon: Icon(Icons.alt_route), label: 'Routes'),
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications),
-            label: 'Alerts',
-          ),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profile'),
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home),
+              label: AppL10n.of(context).t('nav.home')),
+          NavigationDestination(
+              icon: const Icon(Icons.map_outlined),
+              selectedIcon: const Icon(Icons.map),
+              label: AppL10n.of(context).t('nav.map')),
+          NavigationDestination(
+              icon: const Icon(Icons.alt_route_outlined),
+              selectedIcon: const Icon(Icons.alt_route),
+              label: AppL10n.of(context).t('nav.routes')),
+          NavigationDestination(
+              icon: const Icon(Icons.notifications_outlined),
+              selectedIcon: const Icon(Icons.notifications),
+              label: AppL10n.of(context).t('nav.alerts')),
+          NavigationDestination(
+              icon: const Icon(Icons.person_outline),
+              selectedIcon: const Icon(Icons.person),
+              label: AppL10n.of(context).t('nav.profile')),
         ],
       ),
     );
