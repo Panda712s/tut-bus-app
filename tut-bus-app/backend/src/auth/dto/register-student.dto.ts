@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import { TUT_STUDENT_EMAIL_REGEX } from '../tut-email';
 
 export class RegisterStudentDto {
   @IsString()
@@ -10,8 +11,8 @@ export class RegisterStudentDto {
   fullName: string;
 
   @IsEmail()
-  @Matches(/@tut4life\.ac\.za$|@tut\.ac\.za$/, {
-    message: 'Please use your official TUT email address',
+  @Matches(TUT_STUDENT_EMAIL_REGEX, {
+    message: 'Use your TUT student email address (yourname@tut4life.ac.za)',
   })
   email: string;
 

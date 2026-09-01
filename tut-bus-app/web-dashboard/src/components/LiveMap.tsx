@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { getGpsSocket } from '@/lib/socket';
 import { api } from '@/lib/api';
@@ -19,6 +19,36 @@ const busIcon = (state: LiveBus['capacityState']) => {
     iconAnchor: [8, 8],
   });
 };
+
+/**
+ * Leaflet measures its container on init. When that container is still
+ * animating in / hasn't reached its final size (flex layout, the dashboard's
+ * fade-in wrapper, a tab switch), the map paints at the wrong size and looks
+ * broken until a window resize. Force a re-measure after mount and whenever
+ * the container resizes.
+ */
+function InvalidateSize() {
+  const map = useMap();
+
+  useEffect(() => {
+    const fix = () => map.invalidateSize({ animate: false });
+    // A few passes to cover the fade-in animation settling.
+    const timers = [0, 120, 300, 600].map((ms) => window.setTimeout(fix, ms));
+
+    const container = map.getContainer();
+    const ro = new ResizeObserver(fix);
+    ro.observe(container);
+    window.addEventListener('resize', fix);
+
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      ro.disconnect();
+      window.removeEventListener('resize', fix);
+    };
+  }, [map]);
+
+  return null;
+}
 
 export function LiveMap() {
   const [buses, setBuses] = useState<Record<string, LiveBus>>({});
@@ -65,6 +95,7 @@ export function LiveMap() {
 
   return (
     <MapContainer center={DEFAULT_CENTER} zoom={12} scrollWheelZoom className="h-full w-full rounded-xl">
+      <InvalidateSize />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

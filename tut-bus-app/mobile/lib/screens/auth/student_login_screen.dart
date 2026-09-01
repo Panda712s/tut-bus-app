@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_exception.dart';
 import '../../state/auth_state.dart';
+import '../../utils/email_validation.dart';
 import '../../widgets/primary_button.dart';
 import 'student_register_screen.dart';
 import 'forgot_password_screen.dart';
@@ -63,8 +64,13 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'TUT email', border: OutlineInputBorder()),
-                  validator: (v) => (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    labelText: 'TUT student email',
+                    hintText: 'yourname@tut4life.ac.za',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: validateTutStudentEmail,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(

@@ -12,6 +12,7 @@ import { Role } from '../common/enums/role.enum';
 import { NotificationsService } from '../notifications/notifications.service';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { LoginDto } from './dto/login.dto';
+import { isTutStudentEmail } from './tut-email';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -79,6 +80,9 @@ export class AuthService {
   }
 
   async loginStudent(dto: LoginDto) {
+    if (!isTutStudentEmail(dto.email)) {
+      throw new UnauthorizedException('Use your TUT student email address (yourname@tut4life.ac.za)');
+    }
     const student = await this.prisma.student.findUnique({ where: { email: dto.email } });
     if (!student || !(await bcrypt.compare(dto.password, student.password))) {
       throw new UnauthorizedException('Invalid email or password');

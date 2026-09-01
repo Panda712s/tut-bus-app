@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/api_exception.dart';
 import '../../services/auth_service.dart';
+import '../../utils/email_validation.dart';
 import '../../widgets/primary_button.dart';
 import 'otp_verification_screen.dart';
 
@@ -84,12 +85,13 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
                   decoration: const InputDecoration(
-                    labelText: 'TUT email',
-                    hintText: 'you@tut4life.ac.za',
+                    labelText: 'TUT student email',
+                    hintText: 'yourname@tut4life.ac.za',
                     border: OutlineInputBorder(),
                   ),
-                  validator: (v) => (v == null || !v.contains('@tut')) ? 'Use your official TUT email' : null,
+                  validator: validateTutStudentEmail,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
