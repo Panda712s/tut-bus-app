@@ -31,7 +31,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm animate-backdrop-in"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4 backdrop-blur-sm animate-backdrop-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -46,7 +46,7 @@ export function Modal({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="-mr-1 flex h-8 w-8 items-center justify-center rounded-lg text-ink-dim transition-colors hover:bg-white/5 hover:text-ink"
+            className="-mr-1 flex h-8 w-8 items-center justify-center rounded-lg text-ink-dim transition-colors hover:bg-accent/[0.06] hover:text-ink"
           >
             ✕
           </button>

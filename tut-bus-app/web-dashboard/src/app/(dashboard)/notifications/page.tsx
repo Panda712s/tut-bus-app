@@ -54,8 +54,8 @@ export default function NotificationsPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-line bg-surface p-5 shadow-card">
           <h2 className="mb-3 text-sm font-semibold text-ink">Compose</h2>
-          {error && <p className="mb-3 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
-          {success && <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">{success}</p>}
+          {error && <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+          {success && <p className="mb-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p>}
           <form onSubmit={handleSend}>
             <Field label="Title">
               <Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Bus 14 delayed" />

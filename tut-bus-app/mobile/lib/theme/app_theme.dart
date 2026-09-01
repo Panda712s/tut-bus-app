@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  static const accent = Color(0xFF8B5CF6);
-  static const accentStrong = Color(0xFF7C3AED);
-  static const accentSoft = Color(0x248B5CF6); // ~14% violet
+  static const accent = Color(0xFF0A5796); // official TUT blue
+  static const accentStrong = Color(0xFF073E68);
+  static const accentSoft = Color(0x240A5796); // ~14% TUT blue
+  static const gold = Color(0xFFFAB416); // TUT gold, secondary accent
 
   // Dark surfaces (kept as named constants for the few screens that still
   // reference them directly).

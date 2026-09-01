@@ -16,7 +16,7 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background = color ?? const Color(0xFF8B5CF6);
+    final background = color ?? const Color(0xFF0A5796);
 
     return SizedBox(
       width: double.infinity,

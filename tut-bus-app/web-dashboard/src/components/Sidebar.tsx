@@ -51,7 +51,7 @@ export function Sidebar() {
                 'group relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-150',
                 active
                   ? 'bg-accent/[0.14] text-accent shadow-[inset_0_1px_0_0_rgb(255_255_255/0.04)]'
-                  : 'text-ink-muted hover:bg-white/[0.04] hover:text-ink',
+                  : 'text-ink-muted hover:bg-accent/[0.06] hover:text-ink',
               )}
             >
               <span
@@ -72,7 +72,7 @@ export function Sidebar() {
       <div className="border-t border-line/70 p-3">
         <button
           onClick={handleLogout}
-          className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-ink-muted transition-colors hover:bg-white/[0.04] hover:text-ink"
+          className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-ink-muted transition-colors hover:bg-accent/[0.06] hover:text-ink"
         >
           ↩ Sign out
         </button>

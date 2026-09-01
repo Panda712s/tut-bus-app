@@ -136,10 +136,10 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: Card(
                 elevation: 0,
-                color: const Color(0x148B5CF6),
+                color: const Color(0x140A5796),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Color(0x338B5CF6)),
+                  side: const BorderSide(color: Color(0x330A5796)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(14),
@@ -148,9 +148,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.schedule_rounded, size: 18, color: Color(0xFF8B5CF6)),
+                          Icon(Icons.schedule_rounded, size: 18, color: Color(0xFF0A5796)),
                           SizedBox(width: 6),
-                          Text('Next arrivals', style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFC4B5FD))),
+                          Text('Next arrivals', style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF93C5FD))),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -170,7 +170,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
                                 ),
                                 Text(
                                   next.label,
-                                  style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFC4B5FD)),
+                                  style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF93C5FD)),
                                 ),
                               ],
                             ),
@@ -193,7 +193,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
                   ..._liveBuses.map(
                     (bus) => Card(
                       child: ListTile(
-                        leading: const Icon(Icons.directions_bus_filled_rounded, color: Color(0xFF8B5CF6)),
+                        leading: const Icon(Icons.directions_bus_filled_rounded, color: Color(0xFF0A5796)),
                         title: Text(bus.busNumber),
                         subtitle: Text('${bus.passengerCount}/${bus.capacity} passengers'),
                         trailing: FilledButton(
@@ -228,7 +228,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
           ),
           TabBar(
             controller: _tabController,
-            labelColor: const Color(0xFF8B5CF6),
+            labelColor: const Color(0xFF0A5796),
             tabs: _dayTypes.map((d) => Tab(text: d[0] + d.substring(1).toLowerCase())).toList(),
           ),
           SizedBox(

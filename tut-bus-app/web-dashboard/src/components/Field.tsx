@@ -1,7 +1,7 @@
 import { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from 'react';
 
 const CONTROL_CLASS =
-  'w-full rounded-xl border border-line bg-surface-inset px-3.5 py-2.5 text-sm text-ink transition-colors duration-150 placeholder:text-ink-dim hover:border-white/15 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/35 disabled:cursor-not-allowed disabled:opacity-50 [color-scheme:dark]';
+  'w-full rounded-xl border border-line bg-surface-inset px-3.5 py-2.5 text-sm text-ink transition-colors duration-150 placeholder:text-ink-dim hover:border-ink-dim/40 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/35 disabled:cursor-not-allowed disabled:opacity-50';
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (

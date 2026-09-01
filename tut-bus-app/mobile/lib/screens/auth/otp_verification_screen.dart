@@ -50,7 +50,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(Icons.mark_email_read_outlined, size: 48, color: Color(0xFF8B5CF6)),
+              const Icon(Icons.mark_email_read_outlined, size: 48, color: Color(0xFF0A5796)),
               const SizedBox(height: 16),
               Text(
                 'We sent a 6-digit code to ${widget.email}. Enter it below to verify your account.',

@@ -31,7 +31,7 @@ export default function OverviewPage() {
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-ink">Overview</h1>
       <p className="mb-6 text-sm text-ink-muted">A snapshot of the TUT Bus App system right now.</p>
 
-      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         <StatCard label="Active students" value={overview?.studentCount ?? '—'} />
@@ -54,33 +54,34 @@ export default function OverviewPage() {
               <LineChart data={tripsPerDay} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
                 <defs>
                   <linearGradient id="tripLine" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#22d3ee" />
-                    <stop offset="100%" stopColor="#8b5cf6" />
+                    <stop offset="0%" stopColor="#0A5796" />
+                    <stop offset="100%" stopColor="#FAB416" />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,34,54,0.08)" vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 11, fill: '#6C7385' }}
+                  tick={{ fontSize: 11, fill: '#828FA2' }}
                   tickLine={false}
-                  axisLine={{ stroke: 'rgba(255,255,255,0.08)' }}
+                  axisLine={{ stroke: 'rgba(15,34,54,0.12)' }}
                 />
                 <YAxis
                   allowDecimals={false}
-                  tick={{ fontSize: 11, fill: '#6C7385' }}
+                  tick={{ fontSize: 11, fill: '#828FA2' }}
                   tickLine={false}
                   axisLine={false}
                 />
                 <Tooltip
-                  cursor={{ stroke: 'rgba(255,255,255,0.12)' }}
+                  cursor={{ stroke: 'rgba(15,34,54,0.15)' }}
                   contentStyle={{
-                    background: '#1A1E2B',
-                    border: '1px solid #262B3A',
+                    background: '#FFFFFF',
+                    border: '1px solid #E0E7F0',
                     borderRadius: 12,
-                    color: '#E8EAF0',
+                    color: '#0F2236',
                     fontSize: 12,
+                    boxShadow: '0 8px 24px -12px rgba(15,34,54,0.18)',
                   }}
-                  labelStyle={{ color: '#A2A9BC' }}
+                  labelStyle={{ color: '#4C5C70' }}
                 />
                 <Line
                   type="monotone"
@@ -88,7 +89,7 @@ export default function OverviewPage() {
                   stroke="url(#tripLine)"
                   strokeWidth={2.5}
                   dot={false}
-                  activeDot={{ r: 4, fill: '#8b5cf6', stroke: '#0b0d12', strokeWidth: 2 }}
+                  activeDot={{ r: 4, fill: '#0A5796', stroke: '#FFFFFF', strokeWidth: 2 }}
                 />
               </LineChart>
             </ResponsiveContainer>

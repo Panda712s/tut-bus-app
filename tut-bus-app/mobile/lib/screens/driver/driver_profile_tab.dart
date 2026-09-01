@@ -47,7 +47,7 @@ class _DriverProfileTabState extends State<DriverProfileTab> {
               children: [
                 CircleAvatar(
                   radius: 36,
-                  backgroundColor: const Color(0xFF8B5CF6),
+                  backgroundColor: const Color(0xFF0A5796),
                   child: Text(
                     (_profile?.fullName.isNotEmpty ?? false) ? _profile!.fullName[0].toUpperCase() : '?',
                     style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),

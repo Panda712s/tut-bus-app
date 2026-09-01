@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_exception.dart';
 import '../../state/auth_state.dart';
+import '../../widgets/auth_backdrop.dart';
 import '../../widgets/primary_button.dart';
 
 class DriverLoginScreen extends StatefulWidget {
@@ -17,6 +18,13 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   String? _error;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -36,36 +44,47 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Driver sign in')),
-      body: SafeArea(
+      appBar: AppBar(backgroundColor: Colors.transparent),
+      extendBodyBehindAppBar: true,
+      body: AuthBackdrop(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 8),
-                const Text('Driver sign in', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                const Text('Accounts are created by transport administrators', style: TextStyle(color: Color(0xFF8A90A2))),
-                const SizedBox(height: 28),
+                const AuthHeader(
+                  title: 'Driver sign in',
+                  subtitle: 'Accounts are created by transport administrators',
+                ),
+                const SizedBox(height: 32),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+                  autocorrect: false,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.mail_outline_rounded),
+                  ),
                   validator: (v) => (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _submit(),
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: Icon(Icons.lock_outline_rounded),
+                  ),
                   validator: (v) => (v == null || v.isEmpty) ? 'Enter your password' : null,
                 ),
                 if (_error != null) ...[
-                  const SizedBox(height: 14),
-                  Text(_error!, style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 16),
+                  _ErrorBanner(message: _error!),
                 ],
                 const SizedBox(height: 20),
                 PrimaryButton(label: 'Sign in', loading: _loading, onPressed: _submit),
@@ -73,6 +92,33 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ErrorBanner extends StatelessWidget {
+  const _ErrorBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0x1FF87171),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0x40F87171)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline_rounded, color: Color(0xFFF87171), size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(message, style: const TextStyle(color: Color(0xFFFCA5A5), fontSize: 13)),
+          ),
+        ],
       ),
     );
   }

@@ -56,7 +56,7 @@ export default function DriversPage() {
         </button>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
         <table className="min-w-full divide-y divide-line text-sm">
@@ -79,7 +79,7 @@ export default function DriversPage() {
                 <td className="px-4 py-3 text-ink-muted">{d.licenseNumber}</td>
                 <td className="px-4 py-3"><Badge value={d.status} /></td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleDeactivate(d.id)} className="text-xs font-medium text-red-300 hover:underline">
+                  <button onClick={() => handleDeactivate(d.id)} className="text-xs font-medium text-red-700 hover:underline">
                     Deactivate
                   </button>
                 </td>

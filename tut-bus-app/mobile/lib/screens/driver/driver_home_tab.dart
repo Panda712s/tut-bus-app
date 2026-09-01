@@ -96,7 +96,7 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                         Card(
                           color: Colors.blue.shade50,
                           child: ListTile(
-                            leading: const Icon(Icons.play_circle_fill_rounded, color: Color(0xFF8B5CF6)),
+                            leading: const Icon(Icons.play_circle_fill_rounded, color: Color(0xFF0A5796)),
                             title: const Text('You have a trip in progress'),
                             subtitle: Text('Status: ${_activeTrip!['status']}'),
                             trailing: FilledButton(

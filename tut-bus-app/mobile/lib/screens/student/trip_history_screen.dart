@@ -47,7 +47,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                     final e = _entries[index];
                     final duration = e.alightedAt != null ? e.alightedAt!.difference(e.boardedAt) : null;
                     return ListTile(
-                      leading: const Icon(Icons.directions_bus_filled_rounded, color: Color(0xFF8B5CF6)),
+                      leading: const Icon(Icons.directions_bus_filled_rounded, color: Color(0xFF0A5796)),
                       title: Text(e.routeName ?? 'Trip'),
                       subtitle: Text(
                         '${e.busNumber ?? ''} · Boarded ${DateFormat('MMM d, HH:mm').format(e.boardedAt)}',

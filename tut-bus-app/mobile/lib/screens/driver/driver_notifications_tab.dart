@@ -64,7 +64,7 @@ class _DriverNotificationsTabState extends State<DriverNotificationsTab> {
                     itemBuilder: (context, index) {
                       final n = _notifications[index];
                       return ListTile(
-                        leading: Icon(Icons.notifications_outlined, color: n.read ? Colors.white54 : const Color(0xFF8B5CF6)),
+                        leading: Icon(Icons.notifications_outlined, color: n.read ? Colors.white54 : const Color(0xFF0A5796)),
                         title: Text(n.title, style: TextStyle(fontWeight: n.read ? FontWeight.normal : FontWeight.w700)),
                         subtitle: Text(n.body),
                         trailing: Text(DateFormat('MMM d, HH:mm').format(n.createdAt), style: const TextStyle(fontSize: 11)),

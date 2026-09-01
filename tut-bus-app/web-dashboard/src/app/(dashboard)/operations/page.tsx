@@ -76,20 +76,20 @@ export default function OperationsPage() {
           </p>
         </div>
         <span
-          className={`h-2.5 w-2.5 rounded-full transition-colors duration-500 ${pulse ? 'bg-emerald-400' : 'bg-emerald-500/40'}`}
+          className={`h-2.5 w-2.5 rounded-full transition-colors duration-500 ${pulse ? 'bg-emerald-500' : 'bg-emerald-300'}`}
           title="Live"
         />
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       {/* SOS — most urgent, always on top */}
       {sos.length > 0 && (
-        <div className="mb-6 overflow-hidden rounded-2xl border border-red-500/25 bg-red-500/10 shadow-card">
-          <div className="border-b border-red-500/25 px-4 py-2.5 text-sm font-semibold text-red-300">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-red-200 bg-red-50 shadow-card">
+          <div className="border-b border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700">
             🆘 {sos.length} active SOS alert{sos.length > 1 ? 's' : ''}
           </div>
-          <ul className="divide-y divide-red-500/15">
+          <ul className="divide-y divide-red-100">
             {sos.map((a) => (
               <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                 <div>
@@ -120,7 +120,7 @@ export default function OperationsPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => ackSos(a.id)}
-                    className="rounded-lg border border-red-500/40 bg-surface px-3 py-1.5 text-xs font-semibold text-red-300 transition-colors hover:bg-red-500/20"
+                    className="rounded-lg border border-red-300 bg-surface px-3 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100"
                   >
                     Acknowledge
                   </button>
@@ -147,8 +147,8 @@ export default function OperationsPage() {
 
       {/* Off-route alerts */}
       {deviations.length > 0 && (
-        <div className="mb-6 overflow-hidden rounded-2xl border border-amber-500/25 bg-surface shadow-card">
-          <div className="border-b border-amber-500/25 bg-amber-500/10 px-4 py-2.5 text-sm font-semibold text-amber-300">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-amber-200 bg-surface shadow-card">
+          <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700">
             ⚠️ {deviations.length} bus{deviations.length > 1 ? 'es' : ''} off route
           </div>
           <ul className="divide-y divide-line/60">
@@ -165,7 +165,7 @@ export default function OperationsPage() {
                 </div>
                 <button
                   onClick={() => clearDeviation(d.id)}
-                  className="rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:bg-white/5"
+                  className="rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:bg-accent/[0.06]"
                 >
                   Clear
                 </button>
@@ -191,7 +191,7 @@ export default function OperationsPage() {
           </thead>
           <tbody className="divide-y divide-line/60">
             {(fleet?.buses ?? []).map((b) => (
-              <tr key={b.tripId} className={b.offRoute ? 'bg-amber-500/[0.07]' : undefined}>
+              <tr key={b.tripId} className={b.offRoute ? 'bg-amber-50' : undefined}>
                 <td className="px-4 py-3 font-medium text-ink">{b.bus.busNumber}</td>
                 <td className="px-4 py-3 text-ink-muted">{b.route.name}</td>
                 <td className="px-4 py-3 text-ink-muted">{b.driver.fullName}</td>
@@ -206,7 +206,7 @@ export default function OperationsPage() {
                 </td>
                 <td className="px-4 py-3">
                   {b.gpsStale ? (
-                    <span className="text-xs font-medium text-red-300">
+                    <span className="text-xs font-medium text-red-700">
                       stale{b.fixAgeSeconds != null ? ` · ${b.fixAgeSeconds}s` : ''}
                     </span>
                   ) : (
@@ -215,7 +215,7 @@ export default function OperationsPage() {
                 </td>
                 <td className="px-4 py-3">
                   {b.offRoute ? (
-                    <span className="inline-flex items-center rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-medium text-amber-300 ring-1 ring-inset ring-amber-500/25">
+                    <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
                       off route · {metresLabel(b.offRoute.distanceMeters)}
                     </span>
                   ) : (
@@ -249,9 +249,9 @@ function Kpi({
 }) {
   const toneClass =
     tone === 'alert'
-      ? 'border-red-500/25 bg-red-500/10 text-red-300'
+      ? 'border-red-200 bg-red-50 text-red-700'
       : tone === 'warn'
-        ? 'border-amber-500/25 bg-amber-500/10 text-amber-300'
+        ? 'border-amber-200 bg-amber-50 text-amber-700'
         : 'border-line bg-surface text-ink';
   return (
     <div className={`rounded-xl border p-4 shadow-card ${toneClass}`}>

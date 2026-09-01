@@ -6,7 +6,7 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF090A0F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -17,27 +17,32 @@ class SplashScreen extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+                  colors: [Color(0xFF0A5796), Color(0xFF073E68)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(22),
                 boxShadow: const [
-                  BoxShadow(color: Color(0x668B5CF6), blurRadius: 32, offset: Offset(0, 8)),
+                  BoxShadow(color: Color(0x660A5796), blurRadius: 32, offset: Offset(0, 8)),
                 ],
               ),
               child: const Icon(Icons.directions_bus_filled_rounded, color: Colors.white, size: 44),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'TUT Bus App',
-              style: TextStyle(color: Color(0xFFE8EAF0), fontSize: 22, fontWeight: FontWeight.w700, letterSpacing: -0.3),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.3,
+              ),
             ),
             const SizedBox(height: 28),
             const SizedBox(
               width: 22,
               height: 22,
-              child: CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF8B5CF6)),
+              child: CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF0A5796)),
             ),
           ],
         ),

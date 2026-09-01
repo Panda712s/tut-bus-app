@@ -41,6 +41,7 @@ const config: Config = {
           soft: 'rgb(var(--accent-soft) / <alpha-value>)',
           ink: 'rgb(var(--accent-ink) / <alpha-value>)',
         },
+        gold: 'rgb(var(--gold) / <alpha-value>)',
         // Kept so any lingering `brand-*` utilities still resolve to the accent ramp.
         brand: {
           50: 'rgb(var(--accent-soft) / <alpha-value>)',
@@ -56,10 +57,10 @@ const config: Config = {
         },
       },
       boxShadow: {
-        card: '0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 12px 32px -16px rgb(0 0 0 / 0.7)',
-        'card-hover': '0 1px 0 0 rgb(255 255 255 / 0.06) inset, 0 18px 44px -18px rgb(0 0 0 / 0.75)',
-        glow: '0 0 0 1px rgb(var(--accent-strong) / 0.5), 0 10px 30px -10px rgb(var(--accent) / 0.45)',
-        'glow-sm': '0 0 0 1px rgb(var(--accent-strong) / 0.5), 0 6px 18px -8px rgb(var(--accent) / 0.4)',
+        card: '0 1px 2px 0 rgb(15 34 54 / 0.04), 0 8px 24px -12px rgb(15 34 54 / 0.10)',
+        'card-hover': '0 2px 4px 0 rgb(15 34 54 / 0.05), 0 16px 40px -16px rgb(15 34 54 / 0.16)',
+        glow: '0 8px 24px -8px rgb(var(--accent) / 0.4)',
+        'glow-sm': '0 4px 14px -6px rgb(var(--accent) / 0.4)',
       },
       keyframes: {
         'fade-in': {
@@ -86,7 +87,7 @@ const config: Config = {
       backgroundImage: {
         'accent-grad': 'linear-gradient(135deg, rgb(var(--accent)) 0%, rgb(var(--accent-strong)) 100%)',
         'canvas-glow':
-          'radial-gradient(60rem 40rem at 80% -10%, rgb(var(--accent) / 0.12), transparent 60%), radial-gradient(50rem 40rem at -10% 10%, rgb(34 211 238 / 0.06), transparent 55%)',
+          'radial-gradient(60rem 40rem at 82% -12%, rgb(var(--accent) / 0.07), transparent 60%), radial-gradient(46rem 36rem at -8% 8%, rgb(var(--gold) / 0.06), transparent 55%)',
       },
     },
   },

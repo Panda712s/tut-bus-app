@@ -29,15 +29,23 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-accent/20 blur-[120px]" />
-      <div className="pointer-events-none absolute bottom-0 right-0 h-[30rem] w-[30rem] translate-x-1/3 translate-y-1/3 rounded-full bg-cyan-500/10 blur-[120px]" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-accent-grad px-4">
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-accent/10 blur-[120px]" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-[30rem] w-[30rem] translate-x-1/3 translate-y-1/3 rounded-full bg-gold/25 blur-[130px]" />
 
-      <div className="relative w-full max-w-md rounded-2xl border border-line bg-surface/80 p-8 shadow-card backdrop-blur-xl animate-scale-in">
+      {/* Official Tshwane University of Technology logo, faint watermark */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/brand/tut-logo.svg"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 w-[min(46rem,90vw)] -translate-x-1/2 -translate-y-1/2 select-none opacity-[0.08] brightness-0 invert"
+      />
+
+      <div className="relative w-full max-w-md rounded-2xl border border-line bg-surface p-8 shadow-card animate-scale-in">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-grad text-xl font-bold text-white shadow-glow-sm">
-            T
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/tut-logo.svg" alt="Tshwane University of Technology" className="mx-auto mb-5 h-14" />
           <h1 className="text-xl font-semibold tracking-tight text-ink">TUT Bus App</h1>
           <p className="mt-1 text-sm text-ink-muted">Transport administrator sign in</p>
         </div>
@@ -50,7 +58,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-line bg-surface-inset px-3.5 py-2.5 text-sm text-ink transition-colors duration-150 placeholder:text-ink-dim hover:border-white/15 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/35 [color-scheme:dark]"
+              className="w-full rounded-xl border border-line bg-surface-inset px-3.5 py-2.5 text-sm text-ink transition-colors duration-150 placeholder:text-ink-dim hover:border-ink-dim/40 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
               placeholder="admin@tut.ac.za"
             />
           </div>
@@ -61,13 +69,13 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-line bg-surface-inset px-3.5 py-2.5 text-sm text-ink transition-colors duration-150 placeholder:text-ink-dim hover:border-white/15 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/35 [color-scheme:dark]"
+              className="w-full rounded-xl border border-line bg-surface-inset px-3.5 py-2.5 text-sm text-ink transition-colors duration-150 placeholder:text-ink-dim hover:border-ink-dim/40 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <p className="rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-300 ring-1 ring-inset ring-red-500/20">
+            <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-inset ring-red-600/20">
               {error}
             </p>
           )}

@@ -43,7 +43,7 @@ export default function StudentsPage() {
         />
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
         <table className="min-w-full divide-y divide-line text-sm">
@@ -67,7 +67,7 @@ export default function StudentsPage() {
                 <td className="px-4 py-3"><Badge value={s.isActive ? 'ACTIVE' : 'INACTIVE'} /></td>
                 <td className="px-4 py-3 text-right">
                   {s.isActive && (
-                    <button onClick={() => handleDeactivate(s.id)} className="text-xs font-medium text-red-300 hover:underline">
+                    <button onClick={() => handleDeactivate(s.id)} className="text-xs font-medium text-red-700 hover:underline">
                       Deactivate
                     </button>
                   )}

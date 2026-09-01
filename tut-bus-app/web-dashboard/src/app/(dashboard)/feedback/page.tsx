@@ -25,7 +25,7 @@ function TagChip({ tag }: { tag: string }) {
   return (
     <span
       className={`inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
-        negative ? 'bg-red-500/10 text-red-300 ring-red-600/20' : 'bg-surface-raised text-ink-muted ring-white/10'
+        negative ? 'bg-red-50 text-red-700 ring-red-600/20' : 'bg-surface-raised text-ink-muted ring-ink/10'
       }`}
     >
       {tag.replace(/_/g, ' ').toLowerCase()}
@@ -48,7 +48,7 @@ export default function FeedbackPage() {
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-ink">Feedback</h1>
       <p className="mb-6 text-sm text-ink-muted">Ratings, issue reports and suggestions submitted by students.</p>
 
-      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       {ratings.length > 0 && (
         <section className="mb-8">

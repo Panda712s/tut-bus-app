@@ -92,7 +92,7 @@ class _HomeTabState extends State<HomeTab> {
                               side: BorderSide(color: Theme.of(context).dividerColor),
                             ),
                             child: ListTile(
-                              leading: const Icon(Icons.directions_bus_filled_rounded, color: Color(0xFF8B5CF6)),
+                              leading: const Icon(Icons.directions_bus_filled_rounded, color: Color(0xFF0A5796)),
                               title: Text(bus.busNumber),
                               subtitle: Text('${bus.passengerCount}/${bus.capacity} passengers'),
                               trailing: CapacityBadge(state: bus.capacityState),
@@ -139,7 +139,7 @@ class _WeatherAnnouncementCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+          colors: [Color(0xFF0A5796), Color(0xFF073E68)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

@@ -64,7 +64,7 @@ export default function SchedulesPage() {
         </Field>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
@@ -84,7 +84,7 @@ export default function SchedulesPage() {
                   <td className="px-4 py-3 text-ink-muted">{s.period}</td>
                   <td className="px-4 py-3 font-medium text-ink">{s.departureTime}</td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => handleRemove(s.id)} className="text-xs font-medium text-red-300 hover:underline">
+                    <button onClick={() => handleRemove(s.id)} className="text-xs font-medium text-red-700 hover:underline">
                       Remove
                     </button>
                   </td>

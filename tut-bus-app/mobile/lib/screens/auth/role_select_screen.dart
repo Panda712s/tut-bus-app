@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/auth_backdrop.dart';
 import 'student_login_screen.dart';
 import 'driver_login_screen.dart';
 
@@ -8,43 +9,51 @@ class RoleSelectScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
+      body: AuthBackdrop(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 48, 24, 32),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Spacer(),
-              Container(
-                height: 84,
-                width: 84,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: const Color(0xFF8B5CF6), borderRadius: BorderRadius.circular(20)),
-                child: const Icon(Icons.directions_bus_filled_rounded, color: Colors.white, size: 42),
+              const AuthHeader(
+                title: 'TUT Bus App',
+                subtitle: 'Smart Campus Bus Tracking and Management System',
+                logoHeight: 72,
               ),
-              const SizedBox(height: 20),
-              const Text('TUT Bus App', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-              const SizedBox(height: 8),
-              const Text(
-                'Smart Campus Bus Tracking and Management System',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF8A90A2)),
+              const SizedBox(height: 44),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'CONTINUE AS',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 12),
               _RoleCard(
-                title: 'I am a Student',
+                title: 'Student',
                 subtitle: 'Track buses, view schedules, get notified',
                 icon: Icons.school_rounded,
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const StudentLoginScreen())),
+                onTap: () => Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => const StudentLoginScreen())),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               _RoleCard(
-                title: 'I am a Driver',
-                subtitle: 'Start trips, share your live location',
+                title: 'Driver',
+                subtitle: 'Start trips and share your live location',
                 icon: Icons.airport_shuttle_rounded,
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DriverLoginScreen())),
+                onTap: () => Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => const DriverLoginScreen())),
               ),
-              const Spacer(flex: 2),
+              const SizedBox(height: 32),
+              Text(
+                'Administrators sign in on the web dashboard',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+              ),
             ],
           ),
         ),
@@ -63,43 +72,47 @@ class _RoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor),
-        boxShadow: const [
-          BoxShadow(color: Color(0x66000000), blurRadius: 16, offset: Offset(0, 8)),
-        ],
-      ),
+    final theme = Theme.of(context);
+    return Material(
+      color: theme.cardColor,
+      borderRadius: BorderRadius.circular(18),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(12),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: theme.dividerColor),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                Container(
+                  height: 48,
+                  width: 48,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0x1F0A5796),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, color: const Color(0xFF0A5796), size: 26),
                 ),
-                child: Icon(icon, color: const Color(0xFF8B5CF6), size: 28),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                    const SizedBox(height: 2),
-                    Text(subtitle, style: const TextStyle(color: Color(0xFF8A90A2), fontSize: 13)),
-                  ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                      const SizedBox(height: 3),
+                      Text(subtitle, style: const TextStyle(color: Color(0xFF8A90A2), fontSize: 12.5, height: 1.3)),
+                    ],
+                  ),
                 ),
-              ),
-              const Icon(Icons.chevron_right_rounded, color: Color(0xFF8A90A2)),
-            ],
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward_rounded, color: Color(0xFF0A5796), size: 20),
+              ],
+            ),
           ),
         ),
       ),
