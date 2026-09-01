@@ -46,16 +46,16 @@ export default function NotificationsPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-semibold text-slate-900">Notifications</h1>
-      <p className="mb-6 text-sm text-slate-500">
+      <h1 className="mb-1 text-2xl font-semibold tracking-tight text-ink">Notifications</h1>
+      <p className="mb-6 text-sm text-ink-muted">
         Push a message to students or drivers - delivered instantly over WebSocket and (once configured) FCM.
       </p>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold text-slate-700">Compose</h2>
-          {error && <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
-          {success && <p className="mb-3 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">{success}</p>}
+        <div className="rounded-2xl border border-line bg-surface p-5 shadow-card">
+          <h2 className="mb-3 text-sm font-semibold text-ink">Compose</h2>
+          {error && <p className="mb-3 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+          {success && <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">{success}</p>}
           <form onSubmit={handleSend}>
             <Field label="Title">
               <Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Bus 14 delayed" />
@@ -66,7 +66,7 @@ export default function NotificationsPage() {
                 value={form.body}
                 onChange={(e) => setForm({ ...form, body: e.target.value })}
                 rows={3}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                 placeholder="Bus 14 will arrive 10 minutes late due to traffic."
               />
             </Field>
@@ -88,15 +88,15 @@ export default function NotificationsPage() {
                 </Select>
               </Field>
             )}
-            <button type="submit" className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
+            <button type="submit" className="w-full rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
               Send notification
             </button>
           </form>
         </div>
 
-        <div className="lg:col-span-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+          <table className="min-w-full divide-y divide-line text-sm">
+            <thead className="bg-surface-inset text-left text-xs font-semibold uppercase tracking-wide text-ink-muted">
               <tr>
                 <th className="px-4 py-3">Title</th>
                 <th className="px-4 py-3">Type</th>
@@ -104,18 +104,18 @@ export default function NotificationsPage() {
                 <th className="px-4 py-3">Sent</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-line/60">
               {notifications.map((n) => (
                 <tr key={n.id}>
-                  <td className="px-4 py-3 font-medium text-slate-900">{n.title}</td>
-                  <td className="px-4 py-3 text-slate-600">{n.type.replace(/_/g, ' ')}</td>
-                  <td className="px-4 py-3 text-slate-600">{n.audience.replace(/_/g, ' ')}</td>
-                  <td className="px-4 py-3 text-slate-400">{new Date(n.createdAt).toLocaleString()}</td>
+                  <td className="px-4 py-3 font-medium text-ink">{n.title}</td>
+                  <td className="px-4 py-3 text-ink-muted">{n.type.replace(/_/g, ' ')}</td>
+                  <td className="px-4 py-3 text-ink-muted">{n.audience.replace(/_/g, ' ')}</td>
+                  <td className="px-4 py-3 text-ink-dim">{new Date(n.createdAt).toLocaleString()}</td>
                 </tr>
               ))}
               {notifications.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
+                  <td colSpan={4} className="px-4 py-6 text-center text-ink-dim">
                     No notifications sent yet.
                   </td>
                 </tr>

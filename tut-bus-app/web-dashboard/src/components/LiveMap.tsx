@@ -107,7 +107,7 @@ export function LiveMap() {
               <p className="font-semibold">{bus.busNumber}</p>
               <p>Passengers: {bus.passengerCount}/{bus.capacity} ({bus.capacityState})</p>
               {bus.speedKmh != null && <p>Speed: {bus.speedKmh.toFixed(0)} km/h</p>}
-              {bus.lastLocationAt && <p className="text-slate-400">Updated {new Date(bus.lastLocationAt).toLocaleTimeString()}</p>}
+              {bus.lastLocationAt && <p className="text-ink-dim">Updated {new Date(bus.lastLocationAt).toLocaleTimeString()}</p>}
             </div>
           </Popup>
         </Marker>

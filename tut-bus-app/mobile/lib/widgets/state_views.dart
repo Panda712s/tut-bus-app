@@ -18,7 +18,7 @@ class LoadingView extends StatelessWidget {
           ),
           if (message != null) ...[
             const SizedBox(height: 14),
-            Text(message!, style: const TextStyle(color: Colors.black45, fontSize: 13)),
+            Text(message!, style: const TextStyle(color: Colors.white60, fontSize: 13)),
           ],
         ],
       ),
@@ -43,7 +43,7 @@ class ErrorView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: const BoxDecoration(
-                color: Color(0xFFFEE2E2),
+                color: Color(0x26F87171),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.error_outline_rounded, color: Color(0xFFDC2626), size: 28),
@@ -52,7 +52,7 @@ class ErrorView extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.black54, height: 1.4),
+              style: const TextStyle(color: Colors.white70, height: 1.4),
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
@@ -86,16 +86,16 @@ class EmptyView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
-                color: Color(0xFFF1F5F9),
+                color: Color(0xFF1A1E2B),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Colors.black38, size: 28),
+              child: Icon(icon, color: Colors.white54, size: 28),
             ),
             const SizedBox(height: 14),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.black45, height: 1.4),
+              style: const TextStyle(color: Colors.white60, height: 1.4),
             ),
           ],
         ),

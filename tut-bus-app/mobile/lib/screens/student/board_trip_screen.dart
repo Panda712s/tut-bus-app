@@ -75,7 +75,7 @@ class _BoardTripScreenState extends State<BoardTripScreen> {
           children: [
             QrImageView(data: 'tutbus:${widget.bus.id}', size: 200),
             const SizedBox(height: 8),
-            Text('${widget.route.name} · ${widget.bus.busNumber}', style: const TextStyle(color: Colors.black54)),
+            Text('${widget.route.name} · ${widget.bus.busNumber}', style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 24),
             if (_error != null) ...[
               Text(_error!, style: const TextStyle(color: Colors.red)),
@@ -88,7 +88,7 @@ class _BoardTripScreenState extends State<BoardTripScreen> {
               const SizedBox(height: 8),
               const Text('Boarding confirmed. Have a safe trip!'),
               const SizedBox(height: 16),
-              PrimaryButton(label: "I've alighted", loading: _loading, color: Colors.black87, onPressed: _alight),
+              PrimaryButton(label: "I've alighted", loading: _loading, color: const Color(0xFF262B3A), onPressed: _alight),
             ],
           ],
         ),

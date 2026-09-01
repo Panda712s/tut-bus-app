@@ -69,38 +69,38 @@ export default function OperationsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Operations</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">Operations</h1>
+          <p className="text-sm text-ink-muted">
             Live fleet, off-route alerts and rider SOS — refreshed every 10s
-            {fleet && <span className="text-slate-400"> · updated {relativeTime(fleet.generatedAt)}</span>}
+            {fleet && <span className="text-ink-dim"> · updated {relativeTime(fleet.generatedAt)}</span>}
           </p>
         </div>
         <span
-          className={`h-2.5 w-2.5 rounded-full transition-colors duration-500 ${pulse ? 'bg-green-500' : 'bg-green-300'}`}
+          className={`h-2.5 w-2.5 rounded-full transition-colors duration-500 ${pulse ? 'bg-emerald-400' : 'bg-emerald-500/40'}`}
           title="Live"
         />
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
 
       {/* SOS — most urgent, always on top */}
       {sos.length > 0 && (
-        <div className="mb-6 overflow-hidden rounded-xl border border-red-200 bg-red-50 shadow-card">
-          <div className="border-b border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-red-500/25 bg-red-500/10 shadow-card">
+          <div className="border-b border-red-500/25 px-4 py-2.5 text-sm font-semibold text-red-300">
             🆘 {sos.length} active SOS alert{sos.length > 1 ? 's' : ''}
           </div>
-          <ul className="divide-y divide-red-100">
+          <ul className="divide-y divide-red-500/15">
             {sos.map((a) => (
               <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-slate-900">
+                  <p className="text-sm font-medium text-ink">
                     {a.raisedBy.name ?? 'Unknown'}{' '}
-                    <span className="font-normal text-slate-500">
+                    <span className="font-normal text-ink-muted">
                       ({a.raisedBy.kind.toLowerCase()}
                       {a.raisedBy.ref ? ` · ${a.raisedBy.ref}` : ''})
                     </span>
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-ink-muted">
                     {relativeTime(a.createdAt)}
                     {a.trip?.routeName ? ` · ${a.trip.routeName}` : ''}
                     {a.raisedBy.phone ? ` · ${a.raisedBy.phone}` : ''}
@@ -108,7 +108,7 @@ export default function OperationsPage() {
                   </p>
                   {a.lat != null && a.lng != null && (
                     <a
-                      className="text-xs font-medium text-brand-700 hover:underline"
+                      className="text-xs font-medium text-accent hover:underline"
                       href={`https://www.openstreetmap.org/?mlat=${a.lat}&mlon=${a.lng}#map=17/${a.lat}/${a.lng}`}
                       target="_blank"
                       rel="noreferrer"
@@ -120,13 +120,13 @@ export default function OperationsPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => ackSos(a.id)}
-                    className="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100"
+                    className="rounded-lg border border-red-500/40 bg-surface px-3 py-1.5 text-xs font-semibold text-red-300 transition-colors hover:bg-red-500/20"
                   >
                     Acknowledge
                   </button>
                   <button
                     onClick={() => resolveSos(a.id)}
-                    className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-red-700"
+                    className="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-red-600"
                   >
                     Resolve
                   </button>
@@ -147,25 +147,25 @@ export default function OperationsPage() {
 
       {/* Off-route alerts */}
       {deviations.length > 0 && (
-        <div className="mb-6 overflow-hidden rounded-xl border border-amber-200 bg-white shadow-card">
-          <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-800">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-amber-500/25 bg-surface shadow-card">
+          <div className="border-b border-amber-500/25 bg-amber-500/10 px-4 py-2.5 text-sm font-semibold text-amber-300">
             ⚠️ {deviations.length} bus{deviations.length > 1 ? 'es' : ''} off route
           </div>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-line/60">
             {deviations.map((d) => (
               <li key={d.id} className="flex items-center justify-between px-4 py-3 text-sm">
                 <div>
-                  <span className="font-medium text-slate-900">{d.bus.busNumber}</span>{' '}
-                  <span className="text-slate-500">
+                  <span className="font-medium text-ink">{d.bus.busNumber}</span>{' '}
+                  <span className="text-ink-muted">
                     {d.trip.route.name} · {d.trip.driver.fullName}
                   </span>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-ink-dim">
                     {metresLabel(d.distanceMeters)} off route · since {relativeTime(d.createdAt)}
                   </p>
                 </div>
                 <button
                   onClick={() => clearDeviation(d.id)}
-                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+                  className="rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:bg-white/5"
                 >
                   Clear
                 </button>
@@ -176,9 +176,9 @@ export default function OperationsPage() {
       )}
 
       {/* Fleet wall */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+        <table className="min-w-full divide-y divide-line text-sm">
+          <thead className="bg-surface-inset text-left text-xs font-semibold uppercase tracking-wide text-ink-muted">
             <tr>
               <th className="px-4 py-3">Bus</th>
               <th className="px-4 py-3">Route</th>
@@ -189,33 +189,33 @@ export default function OperationsPage() {
               <th className="px-4 py-3">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-line/60">
             {(fleet?.buses ?? []).map((b) => (
-              <tr key={b.tripId} className={b.offRoute ? 'bg-amber-50/50' : undefined}>
-                <td className="px-4 py-3 font-medium text-slate-900">{b.bus.busNumber}</td>
-                <td className="px-4 py-3 text-slate-600">{b.route.name}</td>
-                <td className="px-4 py-3 text-slate-600">{b.driver.fullName}</td>
+              <tr key={b.tripId} className={b.offRoute ? 'bg-amber-500/[0.07]' : undefined}>
+                <td className="px-4 py-3 font-medium text-ink">{b.bus.busNumber}</td>
+                <td className="px-4 py-3 text-ink-muted">{b.route.name}</td>
+                <td className="px-4 py-3 text-ink-muted">{b.driver.fullName}</td>
                 <td className="px-4 py-3">
-                  <span className="mr-2 tabular-nums text-slate-600">
+                  <span className="mr-2 tabular-nums text-ink-muted">
                     {b.bus.passengerCount}/{b.bus.capacity}
                   </span>
                   <Badge value={b.bus.capacityState} />
                 </td>
-                <td className="px-4 py-3 tabular-nums text-slate-600">
+                <td className="px-4 py-3 tabular-nums text-ink-muted">
                   {b.bus.speedKmh != null ? `${Math.round(b.bus.speedKmh)} km/h` : '—'}
                 </td>
                 <td className="px-4 py-3">
                   {b.gpsStale ? (
-                    <span className="text-xs font-medium text-red-600">
+                    <span className="text-xs font-medium text-red-300">
                       stale{b.fixAgeSeconds != null ? ` · ${b.fixAgeSeconds}s` : ''}
                     </span>
                   ) : (
-                    <span className="text-xs text-slate-400">{b.fixAgeSeconds}s ago</span>
+                    <span className="text-xs text-ink-dim">{b.fixAgeSeconds}s ago</span>
                   )}
                 </td>
                 <td className="px-4 py-3">
                   {b.offRoute ? (
-                    <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
+                    <span className="inline-flex items-center rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-medium text-amber-300 ring-1 ring-inset ring-amber-500/25">
                       off route · {metresLabel(b.offRoute.distanceMeters)}
                     </span>
                   ) : (
@@ -226,7 +226,7 @@ export default function OperationsPage() {
             ))}
             {fleet && fleet.buses.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={7} className="px-4 py-8 text-center text-ink-dim">
                   No trips in progress right now.
                 </td>
               </tr>
@@ -249,10 +249,10 @@ function Kpi({
 }) {
   const toneClass =
     tone === 'alert'
-      ? 'border-red-200 bg-red-50 text-red-700'
+      ? 'border-red-500/25 bg-red-500/10 text-red-300'
       : tone === 'warn'
-        ? 'border-amber-200 bg-amber-50 text-amber-800'
-        : 'border-slate-200 bg-white text-slate-900';
+        ? 'border-amber-500/25 bg-amber-500/10 text-amber-300'
+        : 'border-line bg-surface text-ink';
   return (
     <div className={`rounded-xl border p-4 shadow-card ${toneClass}`}>
       <p className="text-xs font-medium uppercase tracking-wide opacity-70">{label}</p>

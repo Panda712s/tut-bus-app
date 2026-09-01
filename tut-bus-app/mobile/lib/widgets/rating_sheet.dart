@@ -108,7 +108,7 @@ class _RatingSheetState extends State<_RatingSheet> {
             widget.isDriver
                 ? 'Your feedback helps dispatch spot recurring problems.'
                 : 'Your rating is shared with the driver and campus transport.',
-            style: const TextStyle(color: Colors.black54, fontSize: 13),
+            style: const TextStyle(color: Colors.white70, fontSize: 13),
           ),
           const SizedBox(height: 16),
           Center(
@@ -121,7 +121,7 @@ class _RatingSheetState extends State<_RatingSheet> {
                   onPressed: () => setState(() => _score = i + 1),
                   icon: Icon(
                     filled ? Icons.star_rounded : Icons.star_border_rounded,
-                    color: filled ? const Color(0xFFF59E0B) : Colors.black26,
+                    color: filled ? const Color(0xFFF59E0B) : Colors.white38,
                   ),
                 );
               }),
@@ -162,7 +162,7 @@ class _RatingSheetState extends State<_RatingSheet> {
           if (_error != null)
             Padding(
               padding: const EdgeInsets.only(top: 4, bottom: 8),
-              child: Text(_error!, style: const TextStyle(color: Color(0xFFDC2626), fontSize: 13)),
+              child: Text(_error!, style: const TextStyle(color: Color(0xFFF87171), fontSize: 13)),
             ),
           const SizedBox(height: 4),
           SizedBox(

@@ -32,22 +32,22 @@ export default function StudentsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Students</h1>
-          <p className="text-sm text-slate-500">Registered students (self-registered via the mobile app).</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">Students</h1>
+          <p className="text-sm text-ink-muted">Registered students (self-registered via the mobile app).</p>
         </div>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, number or email"
-          className="w-72 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          className="w-72 rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
         />
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+        <table className="min-w-full divide-y divide-line text-sm">
+          <thead className="bg-surface-inset text-left text-xs font-semibold uppercase tracking-wide text-ink-muted">
             <tr>
               <th className="px-4 py-3">Student #</th>
               <th className="px-4 py-3">Name</th>
@@ -57,17 +57,17 @@ export default function StudentsPage() {
               <th className="px-4 py-3" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-line/60">
             {filtered.map((s) => (
               <tr key={s.id}>
-                <td className="px-4 py-3 font-medium text-slate-900">{s.studentNumber}</td>
-                <td className="px-4 py-3 text-slate-600">{s.fullName}</td>
-                <td className="px-4 py-3 text-slate-600">{s.email}</td>
+                <td className="px-4 py-3 font-medium text-ink">{s.studentNumber}</td>
+                <td className="px-4 py-3 text-ink-muted">{s.fullName}</td>
+                <td className="px-4 py-3 text-ink-muted">{s.email}</td>
                 <td className="px-4 py-3">{s.emailVerified ? '✅' : '—'}</td>
                 <td className="px-4 py-3"><Badge value={s.isActive ? 'ACTIVE' : 'INACTIVE'} /></td>
                 <td className="px-4 py-3 text-right">
                   {s.isActive && (
-                    <button onClick={() => handleDeactivate(s.id)} className="text-xs font-medium text-red-600 hover:underline">
+                    <button onClick={() => handleDeactivate(s.id)} className="text-xs font-medium text-red-300 hover:underline">
                       Deactivate
                     </button>
                   )}
@@ -76,7 +76,7 @@ export default function StudentsPage() {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={6} className="px-4 py-6 text-center text-ink-dim">
                   No students found.
                 </td>
               </tr>

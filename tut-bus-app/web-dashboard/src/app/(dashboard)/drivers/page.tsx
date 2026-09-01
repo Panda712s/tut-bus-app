@@ -48,19 +48,19 @@ export default function DriversPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Drivers</h1>
-          <p className="text-sm text-slate-500">Onboard and manage bus drivers.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">Drivers</h1>
+          <p className="text-sm text-ink-muted">Onboard and manage bus drivers.</p>
         </div>
-        <button onClick={() => setOpen(true)} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
+        <button onClick={() => setOpen(true)} className="rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
           + Add driver
         </button>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+        <table className="min-w-full divide-y divide-line text-sm">
+          <thead className="bg-surface-inset text-left text-xs font-semibold uppercase tracking-wide text-ink-muted">
             <tr>
               <th className="px-4 py-3">Employee #</th>
               <th className="px-4 py-3">Name</th>
@@ -70,16 +70,16 @@ export default function DriversPage() {
               <th className="px-4 py-3" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-line/60">
             {drivers.map((d) => (
               <tr key={d.id}>
-                <td className="px-4 py-3 font-medium text-slate-900">{d.employeeNumber}</td>
-                <td className="px-4 py-3 text-slate-600">{d.fullName}</td>
-                <td className="px-4 py-3 text-slate-600">{d.email}</td>
-                <td className="px-4 py-3 text-slate-600">{d.licenseNumber}</td>
+                <td className="px-4 py-3 font-medium text-ink">{d.employeeNumber}</td>
+                <td className="px-4 py-3 text-ink-muted">{d.fullName}</td>
+                <td className="px-4 py-3 text-ink-muted">{d.email}</td>
+                <td className="px-4 py-3 text-ink-muted">{d.licenseNumber}</td>
                 <td className="px-4 py-3"><Badge value={d.status} /></td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleDeactivate(d.id)} className="text-xs font-medium text-red-600 hover:underline">
+                  <button onClick={() => handleDeactivate(d.id)} className="text-xs font-medium text-red-300 hover:underline">
                     Deactivate
                   </button>
                 </td>
@@ -87,7 +87,7 @@ export default function DriversPage() {
             ))}
             {drivers.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={6} className="px-4 py-6 text-center text-ink-dim">
                   No drivers yet.
                 </td>
               </tr>
@@ -116,7 +116,7 @@ export default function DriversPage() {
           <Field label="Phone (optional)">
             <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </Field>
-          <button type="submit" className="mt-2 w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
+          <button type="submit" className="mt-2 w-full rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
             Create driver
           </button>
         </form>

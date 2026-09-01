@@ -189,7 +189,7 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           'Last fix: ${_lastPosition!.latitude.toStringAsFixed(5)}, ${_lastPosition!.longitude.toStringAsFixed(5)}',
-                          style: const TextStyle(fontSize: 12, color: Colors.black54),
+                          style: const TextStyle(fontSize: 12, color: Colors.white70),
                         ),
                       ),
                     if (_gpsPublisher.pendingCount > 0)
@@ -230,7 +230,7 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
             else if (_status == 'PAUSED')
               PrimaryButton(label: 'Resume trip', loading: _busy, onPressed: _resume),
             const SizedBox(height: 10),
-            PrimaryButton(label: 'End trip', loading: _busy, color: Colors.black87, onPressed: _end),
+            PrimaryButton(label: 'End trip', loading: _busy, color: const Color(0xFF262B3A), onPressed: _end),
             const SizedBox(height: 10),
             OutlinedButton.icon(
               onPressed: () => Navigator.of(context).push(

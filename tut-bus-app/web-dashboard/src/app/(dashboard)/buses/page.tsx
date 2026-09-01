@@ -48,19 +48,19 @@ export default function BusesPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Buses</h1>
-          <p className="text-sm text-slate-500">Fleet inventory, route assignment, and live capacity.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">Buses</h1>
+          <p className="text-sm text-ink-muted">Fleet inventory, route assignment, and live capacity.</p>
         </div>
-        <button onClick={() => setOpen(true)} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
+        <button onClick={() => setOpen(true)} className="rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
           + Add bus
         </button>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+        <table className="min-w-full divide-y divide-line text-sm">
+          <thead className="bg-surface-inset text-left text-xs font-semibold uppercase tracking-wide text-ink-muted">
             <tr>
               <th className="px-4 py-3">Bus #</th>
               <th className="px-4 py-3">Plate</th>
@@ -71,17 +71,17 @@ export default function BusesPage() {
               <th className="px-4 py-3" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-line/60">
             {buses.map((b) => (
               <tr key={b.id}>
-                <td className="px-4 py-3 font-medium text-slate-900">{b.busNumber}</td>
-                <td className="px-4 py-3 text-slate-600">{b.plateNumber}</td>
-                <td className="px-4 py-3 text-slate-600">{b.currentRoute?.name ?? '—'}</td>
-                <td className="px-4 py-3 text-slate-600">{b.passengerCount}/{b.capacity}</td>
+                <td className="px-4 py-3 font-medium text-ink">{b.busNumber}</td>
+                <td className="px-4 py-3 text-ink-muted">{b.plateNumber}</td>
+                <td className="px-4 py-3 text-ink-muted">{b.currentRoute?.name ?? '—'}</td>
+                <td className="px-4 py-3 text-ink-muted">{b.passengerCount}/{b.capacity}</td>
                 <td className="px-4 py-3"><Badge value={b.status} /></td>
                 <td className="px-4 py-3"><Badge value={b.capacityState} /></td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleDecommission(b.id)} className="text-xs font-medium text-red-600 hover:underline">
+                  <button onClick={() => handleDecommission(b.id)} className="text-xs font-medium text-red-300 hover:underline">
                     Decommission
                   </button>
                 </td>
@@ -89,7 +89,7 @@ export default function BusesPage() {
             ))}
             {buses.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={7} className="px-4 py-6 text-center text-ink-dim">
                   No buses yet.
                 </td>
               </tr>
@@ -117,7 +117,7 @@ export default function BusesPage() {
               ))}
             </Select>
           </Field>
-          <button type="submit" className="mt-2 w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
+          <button type="submit" className="mt-2 w-full rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
             Create bus
           </button>
         </form>

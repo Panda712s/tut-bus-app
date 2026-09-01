@@ -8,23 +8,24 @@ class CapacityBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dark-tuned: translucent fill, saturated dot, bright label.
     final (Color bg, Color dot, Color text, String label) = switch (state) {
       CapacityState.empty => (
-          const Color(0xFFDCFCE7),
-          const Color(0xFF22C55E),
-          const Color(0xFF15803D),
+          const Color(0x2634D399),
+          const Color(0xFF34D399),
+          const Color(0xFF6EE7B7),
           'Empty',
         ),
       CapacityState.moderate => (
-          const Color(0xFFFEF3C7),
-          const Color(0xFFF59E0B),
-          const Color(0xFFB45309),
+          const Color(0x26FBBF24),
+          const Color(0xFFFBBF24),
+          const Color(0xFFFCD34D),
           'Moderate',
         ),
       CapacityState.full => (
-          const Color(0xFFFEE2E2),
-          const Color(0xFFEF4444),
-          const Color(0xFFB91C1C),
+          const Color(0x26F87171),
+          const Color(0xFFF87171),
+          const Color(0xFFFCA5A5),
           'Full',
         ),
     };

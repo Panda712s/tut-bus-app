@@ -69,7 +69,7 @@ class _RoutesTabState extends State<RoutesTab> {
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: const Color(0xFF0E1018),
               ),
             ),
           ),
@@ -91,7 +91,7 @@ class _RoutesTabState extends State<RoutesTab> {
                                   title: Text(route.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                                   subtitle: Text('${route.origin} → ${route.destination}'),
                                   trailing: route.estimatedDurationMin != null
-                                      ? Text('${route.estimatedDurationMin} min', style: const TextStyle(color: Colors.black45))
+                                      ? Text('${route.estimatedDurationMin} min', style: const TextStyle(color: Colors.white60))
                                       : null,
                                   onTap: () => Navigator.of(context)
                                       .push(MaterialPageRoute(builder: (_) => RouteDetailScreen(routeId: route.id))),

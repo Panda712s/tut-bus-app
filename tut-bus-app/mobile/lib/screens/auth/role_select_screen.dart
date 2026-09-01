@@ -19,7 +19,7 @@ class RoleSelectScreen extends StatelessWidget {
                 height: 84,
                 width: 84,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: const Color(0xFF1E63E0), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: const Color(0xFF8B5CF6), borderRadius: BorderRadius.circular(20)),
                 child: const Icon(Icons.directions_bus_filled_rounded, color: Colors.white, size: 42),
               ),
               const SizedBox(height: 20),
@@ -28,7 +28,7 @@ class RoleSelectScreen extends StatelessWidget {
               const Text(
                 'Smart Campus Bus Tracking and Management System',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 40),
               _RoleCard(
@@ -65,11 +65,11 @@ class _RoleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF131620),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: const Color(0xFF262B3A)),
         boxShadow: const [
-          BoxShadow(color: Color(0x0F0F172A), blurRadius: 10, offset: Offset(0, 4)),
+          BoxShadow(color: Color(0x66000000), blurRadius: 16, offset: Offset(0, 8)),
         ],
       ),
       clipBehavior: Clip.antiAlias,
@@ -82,10 +82,10 @@ class _RoleCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E63E0).withValues(alpha: 0.10),
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: const Color(0xFF1E63E0), size: 28),
+                child: Icon(icon, color: const Color(0xFF8B5CF6), size: 28),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -94,11 +94,11 @@ class _RoleCard extends StatelessWidget {
                   children: [
                     Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                     const SizedBox(height: 2),
-                    Text(subtitle, style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                    Text(subtitle, style: const TextStyle(color: Colors.white70, fontSize: 13)),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: Colors.black38),
+              const Icon(Icons.chevron_right_rounded, color: Colors.white54),
             ],
           ),
         ),

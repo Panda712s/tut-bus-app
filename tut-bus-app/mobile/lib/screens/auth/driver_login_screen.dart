@@ -48,7 +48,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                 const SizedBox(height: 8),
                 const Text('Driver sign in', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                const Text('Accounts are created by transport administrators', style: TextStyle(color: Colors.black54)),
+                const Text('Accounts are created by transport administrators', style: TextStyle(color: Colors.white70)),
                 const SizedBox(height: 28),
                 TextFormField(
                   controller: _emailController,

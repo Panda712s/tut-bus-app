@@ -3,6 +3,31 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: dark;
+
+    /* Surfaces */
+    --canvas: 9 10 15; /* #090A0F */
+    --surface: 19 22 32; /* #131620 */
+    --surface-raised: 26 30 43; /* #1A1E2B */
+    --surface-inset: 14 16 24; /* #0E1018 */
+
+    /* Lines */
+    --line: 38 43 58; /* #262B3A */
+    --line-soft: 255 255 255; /* used at low alpha */
+
+    /* Text */
+    --ink: 232 234 240; /* #E8EAF0 */
+    --ink-muted: 162 169 188; /* #A2A9BC */
+    --ink-dim: 108 115 133; /* #6C7385 */
+
+    /* Accent — electric violet */
+    --accent: 139 92 246; /* #8B5CF6 */
+    --accent-strong: 124 58 237; /* #7C3AED */
+    --accent-soft: 139 92 246; /* used at low alpha */
+    --accent-ink: 245 243 255; /* #F5F3FF */
+  }
+
   html,
   body {
     height: 100%;
@@ -13,13 +38,17 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    background-color: rgb(var(--canvas));
+    background-image: theme('backgroundImage.canvas-glow');
+    background-attachment: fixed;
+    color: rgb(var(--ink));
+    @apply antialiased;
+    font-feature-settings: 'cv11', 'ss01';
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* One consistent keyboard-focus ring across every interactive element. */
   a,
   button,
   input,
@@ -35,7 +64,8 @@
   select:focus-visible,
   textarea:focus-visible,
   [tabindex]:focus-visible {
-    @apply ring-2 ring-brand-500 ring-offset-2 ring-offset-white rounded-lg;
+    box-shadow: 0 0 0 2px rgb(var(--canvas)), 0 0 0 4px rgb(var(--accent));
+    border-radius: 0.5rem;
   }
 
   button:not(:disabled) {
@@ -44,37 +74,42 @@
   }
 
   ::selection {
-    @apply bg-brand-500/20;
+    background: rgb(var(--accent) / 0.32);
   }
 
-  /* Quiet, consistent scrollbars. */
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgb(203 213 225) transparent;
+    scrollbar-color: rgb(var(--line)) transparent;
   }
-
   *::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
-
   *::-webkit-scrollbar-thumb {
-    @apply rounded-full border-2 border-solid border-transparent bg-slate-300 bg-clip-content;
+    background: rgb(var(--line));
+    border: 2px solid transparent;
+    background-clip: content-box;
+    border-radius: 9999px;
   }
-
   *::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400 bg-clip-content;
+    background: rgb(var(--ink-dim));
+    background-clip: content-box;
   }
 }
 
 @layer components {
-  /* Data-table rows get a subtle hover wash on every page. */
   tbody tr {
     @apply transition-colors duration-150;
   }
-
   tbody tr:hover {
-    @apply bg-slate-50/70;
+    background: rgb(var(--line-soft) / 0.04);
+  }
+
+  /* Frosted panel used for the sidebar and sticky headers */
+  .glass {
+    background: rgb(var(--surface) / 0.72);
+    backdrop-filter: blur(12px) saturate(1.4);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
   }
 }
 
@@ -89,7 +124,33 @@
   }
 }
 
+/* Leaflet: recolour the light OSM raster tiles to sit in a dark UI. */
 .leaflet-container {
   height: 100%;
   width: 100%;
+  background: rgb(var(--surface-inset));
+}
+.leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.92) saturate(0.7) !important;
+}
+.leaflet-control-attribution {
+  background: rgb(var(--surface) / 0.8) !important;
+  color: rgb(var(--ink-dim)) !important;
+}
+.leaflet-control-attribution a {
+  color: rgb(var(--ink-muted)) !important;
+}
+.leaflet-bar a {
+  background: rgb(var(--surface-raised)) !important;
+  color: rgb(var(--ink)) !important;
+  border-color: rgb(var(--line)) !important;
+}
+.leaflet-bar a:hover {
+  background: rgb(var(--surface)) !important;
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: rgb(var(--surface-raised)) !important;
+  color: rgb(var(--ink)) !important;
+  box-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.7) !important;
 }

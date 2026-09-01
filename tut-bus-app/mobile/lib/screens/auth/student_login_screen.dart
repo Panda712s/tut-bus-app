@@ -59,7 +59,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                 const SizedBox(height: 8),
                 const Text('Welcome back', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                const Text('Sign in with your TUT student email', style: TextStyle(color: Colors.black54)),
+                const Text('Sign in with your TUT student email', style: TextStyle(color: Colors.white70)),
                 const SizedBox(height: 28),
                 TextFormField(
                   controller: _emailController,
@@ -97,7 +97,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account?", style: TextStyle(color: Colors.black54)),
+                    const Text("Don't have an account?", style: TextStyle(color: Colors.white70)),
                     TextButton(
                       onPressed: () => Navigator.of(context)
                           .push(MaterialPageRoute(builder: (_) => const StudentRegisterScreen())),

@@ -45,7 +45,7 @@ class _DriverProfileTabState extends State<DriverProfileTab> {
               children: [
                 CircleAvatar(
                   radius: 36,
-                  backgroundColor: const Color(0xFF1E63E0),
+                  backgroundColor: const Color(0xFF8B5CF6),
                   child: Text(
                     (_profile?.fullName.isNotEmpty ?? false) ? _profile!.fullName[0].toUpperCase() : '?',
                     style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
@@ -53,7 +53,7 @@ class _DriverProfileTabState extends State<DriverProfileTab> {
                 ),
                 const SizedBox(height: 12),
                 Center(child: Text(_profile?.fullName ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600))),
-                Center(child: Text(_profile?.employeeNumber ?? '', style: const TextStyle(color: Colors.black54))),
+                Center(child: Text(_profile?.employeeNumber ?? '', style: const TextStyle(color: Colors.white70))),
                 const SizedBox(height: 24),
                 Card(
                   child: Column(

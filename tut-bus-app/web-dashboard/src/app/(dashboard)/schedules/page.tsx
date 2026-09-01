@@ -51,8 +51,8 @@ export default function SchedulesPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-semibold text-slate-900">Schedules</h1>
-      <p className="mb-6 text-sm text-slate-500">Morning, afternoon, weekend and holiday departure times per route.</p>
+      <h1 className="mb-1 text-2xl font-semibold tracking-tight text-ink">Schedules</h1>
+      <p className="mb-6 text-sm text-ink-muted">Morning, afternoon, weekend and holiday departure times per route.</p>
 
       <div className="mb-6 max-w-xs">
         <Field label="Route">
@@ -64,12 +64,12 @@ export default function SchedulesPage() {
         </Field>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+          <table className="min-w-full divide-y divide-line text-sm">
+            <thead className="bg-surface-inset text-left text-xs font-semibold uppercase tracking-wide text-ink-muted">
               <tr>
                 <th className="px-4 py-3">Day type</th>
                 <th className="px-4 py-3">Period</th>
@@ -77,14 +77,14 @@ export default function SchedulesPage() {
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-line/60">
               {schedules.map((s) => (
                 <tr key={s.id}>
-                  <td className="px-4 py-3 text-slate-600">{s.dayType}</td>
-                  <td className="px-4 py-3 text-slate-600">{s.period}</td>
-                  <td className="px-4 py-3 font-medium text-slate-900">{s.departureTime}</td>
+                  <td className="px-4 py-3 text-ink-muted">{s.dayType}</td>
+                  <td className="px-4 py-3 text-ink-muted">{s.period}</td>
+                  <td className="px-4 py-3 font-medium text-ink">{s.departureTime}</td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => handleRemove(s.id)} className="text-xs font-medium text-red-600 hover:underline">
+                    <button onClick={() => handleRemove(s.id)} className="text-xs font-medium text-red-300 hover:underline">
                       Remove
                     </button>
                   </td>
@@ -92,7 +92,7 @@ export default function SchedulesPage() {
               ))}
               {schedules.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
+                  <td colSpan={4} className="px-4 py-6 text-center text-ink-dim">
                     No schedules for this route yet.
                   </td>
                 </tr>
@@ -101,8 +101,8 @@ export default function SchedulesPage() {
           </table>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold text-slate-700">Add departure time</h2>
+        <div className="rounded-2xl border border-line bg-surface p-5 shadow-card">
+          <h2 className="mb-3 text-sm font-semibold text-ink">Add departure time</h2>
           <form onSubmit={handleCreate}>
             <Field label="Day type">
               <Select value={form.dayType} onChange={(e) => setForm({ ...form, dayType: e.target.value })}>
@@ -117,7 +117,7 @@ export default function SchedulesPage() {
             <Field label="Departure time (24h)">
               <Input type="time" required value={form.departureTime} onChange={(e) => setForm({ ...form, departureTime: e.target.value })} />
             </Field>
-            <button type="submit" className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-brand-700 hover:shadow active:scale-[0.98]">
+            <button type="submit" className="w-full rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
               Add
             </button>
           </form>

@@ -83,7 +83,7 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                     children: [
                       Text('Hi, ${_profile?.fullName ?? 'Driver'}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
-                      Text('Status: ${_profile?.status ?? '—'}', style: const TextStyle(color: Colors.black54)),
+                      Text('Status: ${_profile?.status ?? '—'}', style: const TextStyle(color: Colors.white70)),
                       const SizedBox(height: 24),
                       if (_profile?.assignedBusId == null)
                         const Card(
@@ -96,7 +96,7 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                         Card(
                           color: Colors.blue.shade50,
                           child: ListTile(
-                            leading: const Icon(Icons.play_circle_fill_rounded, color: Color(0xFF1E63E0)),
+                            leading: const Icon(Icons.play_circle_fill_rounded, color: Color(0xFF8B5CF6)),
                             title: const Text('You have a trip in progress'),
                             subtitle: Text('Status: ${_activeTrip!['status']}'),
                             trailing: FilledButton(

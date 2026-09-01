@@ -1,9 +1,10 @@
 export function StatCard({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card transition-all duration-150 hover:-translate-y-0.5 hover:shadow-card-hover">
-      <p className="text-sm font-medium text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-slate-900">{value}</p>
-      {hint && <p className="mt-1 text-xs text-slate-400">{hint}</p>}
+    <div className="group relative overflow-hidden rounded-2xl border border-line bg-surface p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover">
+      <div className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-accent/10 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
+      <p className="text-xs font-medium uppercase tracking-wider text-ink-dim">{label}</p>
+      <p className="mt-2 text-3xl font-semibold tabular-nums tracking-tight text-ink">{value}</p>
+      {hint && <p className="mt-1 text-xs text-ink-dim">{hint}</p>}
     </div>
   );
 }

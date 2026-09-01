@@ -1,19 +1,20 @@
 import clsx from 'clsx';
 
+// Dark-tuned status chips: translucent fill + inset ring, bright label.
 const COLORS: Record<string, string> = {
-  ACTIVE: 'bg-green-100 text-green-700 ring-green-600/20',
-  ON_TRIP: 'bg-blue-100 text-blue-700 ring-blue-600/20',
-  INACTIVE: 'bg-slate-100 text-slate-600 ring-slate-500/20',
-  MAINTENANCE: 'bg-amber-100 text-amber-700 ring-amber-600/20',
-  SUSPENDED: 'bg-red-100 text-red-700 ring-red-600/20',
-  EMPTY: 'bg-green-100 text-green-700 ring-green-600/20',
-  MODERATE: 'bg-amber-100 text-amber-700 ring-amber-600/20',
-  FULL: 'bg-red-100 text-red-700 ring-red-600/20',
-  IN_PROGRESS: 'bg-blue-100 text-blue-700 ring-blue-600/20',
-  PAUSED: 'bg-amber-100 text-amber-700 ring-amber-600/20',
-  COMPLETED: 'bg-slate-100 text-slate-600 ring-slate-500/20',
-  CANCELLED: 'bg-red-100 text-red-700 ring-red-600/20',
-  SCHEDULED: 'bg-slate-100 text-slate-600 ring-slate-500/20',
+  ACTIVE: 'bg-emerald-500/15 text-emerald-300 ring-emerald-500/25',
+  ON_TRIP: 'bg-sky-500/15 text-sky-300 ring-sky-500/25',
+  INACTIVE: 'bg-white/5 text-ink-muted ring-white/10',
+  MAINTENANCE: 'bg-amber-500/15 text-amber-300 ring-amber-500/25',
+  SUSPENDED: 'bg-red-500/15 text-red-300 ring-red-500/25',
+  EMPTY: 'bg-emerald-500/15 text-emerald-300 ring-emerald-500/25',
+  MODERATE: 'bg-amber-500/15 text-amber-300 ring-amber-500/25',
+  FULL: 'bg-red-500/15 text-red-300 ring-red-500/25',
+  IN_PROGRESS: 'bg-sky-500/15 text-sky-300 ring-sky-500/25',
+  PAUSED: 'bg-amber-500/15 text-amber-300 ring-amber-500/25',
+  COMPLETED: 'bg-white/5 text-ink-muted ring-white/10',
+  CANCELLED: 'bg-red-500/15 text-red-300 ring-red-500/25',
+  SCHEDULED: 'bg-white/5 text-ink-muted ring-white/10',
 };
 
 export function Badge({ value }: { value: string }) {
@@ -21,7 +22,7 @@ export function Badge({ value }: { value: string }) {
     <span
       className={clsx(
         'inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset',
-        COLORS[value] ?? 'bg-slate-100 text-slate-600 ring-slate-500/20',
+        COLORS[value] ?? 'bg-white/5 text-ink-muted ring-white/10',
       )}
     >
       {value.replace(/_/g, ' ')}

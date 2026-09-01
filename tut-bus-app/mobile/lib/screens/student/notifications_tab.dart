@@ -118,10 +118,10 @@ class _NotificationsTabState extends State<NotificationsTab> {
                         itemBuilder: (context, index) {
                           final n = _notifications[index];
                           return ListTile(
-                            leading: Icon(_iconFor(n.type), color: n.read ? Colors.black38 : const Color(0xFF1E63E0)),
+                            leading: Icon(_iconFor(n.type), color: n.read ? Colors.white54 : const Color(0xFF8B5CF6)),
                             title: Text(n.title, style: TextStyle(fontWeight: n.read ? FontWeight.normal : FontWeight.w700)),
                             subtitle: Text(n.body),
-                            trailing: Text(DateFormat('MMM d, HH:mm').format(n.createdAt), style: const TextStyle(fontSize: 11, color: Colors.black45)),
+                            trailing: Text(DateFormat('MMM d, HH:mm').format(n.createdAt), style: const TextStyle(fontSize: 11, color: Colors.white60)),
                             onTap: () => _markRead(n),
                           );
                         },

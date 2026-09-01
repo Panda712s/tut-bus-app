@@ -47,7 +47,7 @@ class _ProfileTabState extends State<ProfileTab> {
               children: [
                 CircleAvatar(
                   radius: 36,
-                  backgroundColor: const Color(0xFF1E63E0),
+                  backgroundColor: const Color(0xFF8B5CF6),
                   child: Text(
                     (_profile?.fullName.isNotEmpty ?? false) ? _profile!.fullName[0].toUpperCase() : '?',
                     style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
@@ -58,7 +58,7 @@ class _ProfileTabState extends State<ProfileTab> {
                   child: Text(_profile?.fullName ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                 ),
                 Center(
-                  child: Text(_profile?.studentNumber ?? '', style: const TextStyle(color: Colors.black54)),
+                  child: Text(_profile?.studentNumber ?? '', style: const TextStyle(color: Colors.white70)),
                 ),
                 const SizedBox(height: 24),
                 Card(
