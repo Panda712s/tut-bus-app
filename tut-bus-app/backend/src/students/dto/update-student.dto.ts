@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class UpdateStudentDto {
   @IsOptional()
@@ -9,7 +9,9 @@ export class UpdateStudentDto {
   @IsString()
   phone?: string;
 
+  /** Either an https URL or a `data:image/...;base64,...` URI. */
   @IsOptional()
   @IsString()
+  @MaxLength(6_000_000)
   profileImageUrl?: string;
 }

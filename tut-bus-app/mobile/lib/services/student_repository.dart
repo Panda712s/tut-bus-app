@@ -11,10 +11,11 @@ class StudentRepository {
     return StudentProfile.fromJson(json as Map<String, dynamic>);
   }
 
-  Future<void> updateMyProfile({String? fullName, String? phone}) {
+  Future<void> updateMyProfile({String? fullName, String? phone, String? profileImageUrl}) {
     return _api.patch('/students/me', {
       if (fullName != null) 'fullName': fullName,
       if (phone != null) 'phone': phone,
+      if (profileImageUrl != null) 'profileImageUrl': profileImageUrl,
     });
   }
 }

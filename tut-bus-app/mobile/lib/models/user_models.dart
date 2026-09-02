@@ -55,6 +55,7 @@ class StudentProfile {
   final String fullName;
   final String email;
   final String? phone;
+  final String? profileImageUrl;
   final bool emailVerified;
 
   StudentProfile({
@@ -63,6 +64,7 @@ class StudentProfile {
     required this.fullName,
     required this.email,
     this.phone,
+    this.profileImageUrl,
     required this.emailVerified,
   });
 
@@ -72,6 +74,7 @@ class StudentProfile {
         fullName: json['fullName'] as String,
         email: json['email'] as String,
         phone: json['phone'] as String?,
+        profileImageUrl: json['profileImageUrl'] as String?,
         emailVerified: json['emailVerified'] as bool? ?? false,
       );
 }

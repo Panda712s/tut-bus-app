@@ -11,6 +11,10 @@ class AuthService {
   final ApiService _api;
   final TokenStorage _tokenStorage;
 
+  /// Registers a student. When the backend has email verification disabled it
+  /// responds with a full auth session (tokens), which we persist and return -
+  /// the caller can go straight to the app. Otherwise it returns an empty
+  /// session and the caller navigates to OTP verification next.
   Future<AuthResponse> registerStudent({
     required String studentNumber,
     required String fullName,
@@ -18,17 +22,21 @@ class AuthService {
     required String password,
     String? phone,
   }) async {
-    await _api.post('/auth/student/register', {
+    final json = await _api.post('/auth/student/register', {
       'studentNumber': studentNumber,
       'fullName': fullName,
       'email': email,
       'password': password,
       if (phone != null && phone.isNotEmpty) 'phone': phone,
     });
-    // Registration returns a message + studentId; the caller navigates to OTP verification next.
-    return Future.value(
-      AuthResponse(accessToken: '', refreshToken: '', user: AuthUser(id: '', email: email, role: AppRole.student)),
-    );
+
+    if (json is Map<String, dynamic> && json['accessToken'] is String && (json['accessToken'] as String).isNotEmpty) {
+      final response = AuthResponse.fromJson(json);
+      await _persist(response);
+      return response;
+    }
+
+    return AuthResponse(accessToken: '', refreshToken: '', user: AuthUser(id: '', email: email, role: AppRole.student));
   }
 
   Future<AuthResponse> verifyStudentOtp({required String email, required String code}) async {

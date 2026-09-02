@@ -32,7 +32,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     });
     try {
       await context.read<AuthState>().completeOtpVerification(widget.email, _codeController.text.trim());
-      // RootRouter reacts to the auth state change once verification succeeds.
+      if (!mounted) return;
+      // Clear the auth screens so RootRouter's student shell becomes visible.
+      Navigator.of(context).popUntil((r) => r.isFirst);
     } catch (e) {
       setState(() => _error = e is ApiException ? e.message : 'Verification failed. Please try again.');
     } finally {
@@ -54,7 +56,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               const SizedBox(height: 16),
               Text(
                 'We sent a 6-digit code to ${widget.email}. Enter it below to verify your account.',
-                style: const TextStyle(color: Colors.white70),
+                style: const TextStyle(color: Color(0xFF8A90A2)),
               ),
               const SizedBox(height: 24),
               TextField(

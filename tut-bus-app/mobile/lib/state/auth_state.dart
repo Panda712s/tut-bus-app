@@ -41,6 +41,32 @@ class AuthState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Registers a student. Returns true when the backend signed them straight
+  /// in (email verification disabled); false when OTP verification is still
+  /// required and the caller should show the verification screen.
+  Future<bool> registerStudent({
+    required String studentNumber,
+    required String fullName,
+    required String email,
+    required String password,
+    String? phone,
+  }) async {
+    final res = await _authService.registerStudent(
+      studentNumber: studentNumber,
+      fullName: fullName,
+      email: email,
+      password: password,
+      phone: phone,
+    );
+    if (res.accessToken.isNotEmpty) {
+      user = res.user;
+      status = AuthStatus.signedIn;
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
   Future<void> completeOtpVerification(String email, String code) async {
     final res = await _authService.verifyStudentOtp(email: email, code: code);
     user = res.user;

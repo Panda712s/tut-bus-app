@@ -34,6 +34,9 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
     });
     try {
       await context.read<AuthState>().signInDriver(_emailController.text.trim(), _passwordController.text);
+      if (!mounted) return;
+      // Clear the auth screens so RootRouter's driver shell becomes visible.
+      Navigator.of(context).popUntil((r) => r.isFirst);
     } catch (e) {
       setState(() => _error = e is ApiException ? e.message : 'Login failed. Please try again.');
     } finally {

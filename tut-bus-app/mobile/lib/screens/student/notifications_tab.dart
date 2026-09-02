@@ -6,6 +6,7 @@ import '../../services/notifications_repository.dart';
 import '../../services/socket_service.dart';
 import '../../state/auth_state.dart';
 import '../../widgets/state_views.dart';
+import '../../widgets/tut_background.dart';
 
 class NotificationsTab extends StatefulWidget {
   const NotificationsTab({super.key});
@@ -35,20 +36,25 @@ class _NotificationsTabState extends State<NotificationsTab> {
     });
     try {
       final items = await _repo.fetchMine();
+      if (!mounted) return;
       setState(() => _notifications = items);
-    } catch (_) {
-      setState(() => _error = 'Could not load notifications.');
+    } catch (e) {
+      if (mounted) setState(() => _error = 'Could not load notifications.\n$e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   void _listenLive() {
-    final user = context.read<AuthState>().user;
-    if (user == null) return;
-    _socket.connect(userId: user.id, role: 'STUDENT').then((_) {
-      _socket.onNewNotification((_) => _load());
-    });
+    try {
+      final user = context.read<AuthState>().user;
+      if (user == null) return;
+      _socket.connect(userId: user.id, role: 'STUDENT').then((_) {
+        _socket.onNewNotification((_) => _load());
+      }).catchError((_) {});
+    } catch (_) {
+      // A live-feed failure must never break the screen.
+    }
   }
 
   @override
@@ -102,31 +108,60 @@ class _NotificationsTabState extends State<NotificationsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Notifications')),
-      body: _loading
-          ? const LoadingView()
-          : _error != null
-              ? ErrorView(message: _error!, onRetry: _load)
-              : _notifications.isEmpty
-                  ? const EmptyView(message: 'No notifications yet.')
-                  : RefreshIndicator(
-                      onRefresh: _load,
-                      child: ListView.separated(
-                        itemCount: _notifications.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
-                        itemBuilder: (context, index) {
-                          final n = _notifications[index];
-                          return ListTile(
-                            leading: Icon(_iconFor(n.type), color: n.read ? Colors.white54 : const Color(0xFF0A5796)),
-                            title: Text(n.title, style: TextStyle(fontWeight: n.read ? FontWeight.normal : FontWeight.w700)),
-                            subtitle: Text(n.body),
-                            trailing: Text(DateFormat('MMM d, HH:mm').format(n.createdAt), style: const TextStyle(fontSize: 11, color: Colors.white60)),
-                            onTap: () => _markRead(n),
-                          );
-                        },
+      body: TutBackground(
+        child: _loading
+            ? const LoadingView()
+            : _error != null
+                ? ErrorView(message: _error!, onRetry: _load)
+                : _notifications.isEmpty
+                    ? const EmptyView(message: 'No notifications yet.')
+                    : RefreshIndicator(
+                        onRefresh: _load,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                          itemCount: _notifications.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            final n = _notifications[index];
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: theme.cardColor,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: n.read ? theme.dividerColor : const Color(0x330A5796),
+                                ),
+                              ),
+                              child: ListTile(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                leading: Container(
+                                  height: 38,
+                                  width: 38,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0x1F0A5796),
+                                    borderRadius: BorderRadius.circular(11),
+                                  ),
+                                  child: Icon(_iconFor(n.type),
+                                      size: 20,
+                                      color: n.read ? const Color(0xFF8A90A2) : const Color(0xFF0A5796)),
+                                ),
+                                title: Text(n.title,
+                                    style: TextStyle(fontWeight: n.read ? FontWeight.w500 : FontWeight.w700)),
+                                subtitle: Text(n.body, maxLines: 2, overflow: TextOverflow.ellipsis),
+                                trailing: Text(
+                                  DateFormat('MMM d, HH:mm').format(n.createdAt),
+                                  style: const TextStyle(fontSize: 11, color: Color(0xFF8A90A2)),
+                                ),
+                                onTap: () => _markRead(n),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
+      ),
     );
   }
 }

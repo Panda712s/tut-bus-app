@@ -37,7 +37,9 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
     });
     try {
       await context.read<AuthState>().signInStudent(_emailController.text.trim(), _passwordController.text);
-      // RootRouter reacts to the auth state change and swaps to the student shell.
+      if (!mounted) return;
+      // Clear the auth screens so RootRouter's student shell becomes visible.
+      Navigator.of(context).popUntil((r) => r.isFirst);
     } catch (e) {
       setState(() => _error = e is ApiException ? e.message : 'Login failed. Please try again.');
     } finally {

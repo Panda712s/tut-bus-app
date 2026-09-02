@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/transport_models.dart';
 import '../../services/transport_repository.dart';
 import '../../widgets/state_views.dart';
+import '../../widgets/tut_background.dart';
 import 'route_detail_screen.dart';
 
 class RoutesTab extends StatefulWidget {
@@ -57,19 +58,17 @@ class _RoutesTabState extends State<RoutesTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Bus Routes')),
-      body: Column(
+      body: TutBackground(
+        child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: TextField(
               controller: _searchController,
               onChanged: _onSearchChanged,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Search by campus, route or destination',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.surface,
+                prefixIcon: Icon(Icons.search_rounded),
               ),
             ),
           ),
@@ -101,6 +100,7 @@ class _RoutesTabState extends State<RoutesTab> {
                           ),
           ),
         ],
+        ),
       ),
     );
   }

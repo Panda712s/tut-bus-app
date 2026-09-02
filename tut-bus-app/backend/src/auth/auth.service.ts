@@ -30,6 +30,15 @@ export class AuthService {
 
   // ---------- Student ----------
 
+  /**
+   * When SKIP_EMAIL_VERIFICATION is not explicitly set to "false", student
+   * registration completes immediately (no OTP) and sign-in doesn't require
+   * a verified email. Handy while testing; set it to "false" for production.
+   */
+  private get skipEmailVerification(): boolean {
+    return this.config.get<string>('SKIP_EMAIL_VERIFICATION', 'true') !== 'false';
+  }
+
   async registerStudent(dto: RegisterStudentDto) {
     const existing = await this.prisma.student.findFirst({
       where: { OR: [{ email: dto.email }, { studentNumber: dto.studentNumber }] },
@@ -46,8 +55,14 @@ export class AuthService {
         email: dto.email,
         password: hashed,
         phone: dto.phone,
+        emailVerified: this.skipEmailVerification,
       },
     });
+
+    if (this.skipEmailVerification) {
+      // Testing mode: sign the student straight in, no OTP step.
+      return this.buildAuthResponse(student.id, student.email, Role.STUDENT);
+    }
 
     const otp = await this.generateOtp(student.id, 'EMAIL_VERIFICATION');
     // In production this triggers an email/SMS send. Logged here so the flow is demonstrable end-to-end.
@@ -90,7 +105,7 @@ export class AuthService {
     if (!student.isActive) {
       throw new UnauthorizedException('This account has been deactivated');
     }
-    if (!student.emailVerified) {
+    if (!student.emailVerified && !this.skipEmailVerification) {
       throw new UnauthorizedException('Please verify your email before logging in');
     }
     return this.buildAuthResponse(student.id, student.email, Role.STUDENT);
