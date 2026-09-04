@@ -67,11 +67,11 @@ class _DriverIncidentScreenState extends State<DriverIncidentScreen> {
             TextField(
               controller: _descriptionController,
               maxLines: 4,
-              decoration: const InputDecoration(border: OutlineInputBorder(), hintText: 'What happened?'),
+              decoration: const InputDecoration(hintText: 'What happened?'),
             ),
             if (_message != null) ...[
               const SizedBox(height: 12),
-              Text(_message!, style: const TextStyle(color: Colors.red)),
+              Text(_message!, style: const TextStyle(color: Color(0xFFDC2626))),
             ],
             const SizedBox(height: 20),
             PrimaryButton(label: 'Submit report', loading: _loading, onPressed: _submit),

@@ -2,40 +2,41 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateStudentDto } from './dto/update-student.dto';
 
+const STUDENT_SELECT = {
+  id: true, studentNumber: true, fullName: true, email: true, phone: true,
+  profileImageUrl: true, isActive: true, emailVerified: true, createdAt: true,
+};
+
 @Injectable()
 export class StudentsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
     return this.prisma.student.findMany({
-      select: {
-        id: true, studentNumber: true, fullName: true, email: true, phone: true,
-        isActive: true, emailVerified: true, createdAt: true,
-      },
+      select: STUDENT_SELECT,
       orderBy: { createdAt: 'desc' },
     });
   }
 
   async findOne(id: string) {
-    const student = await this.prisma.student.findUnique({
-      where: { id },
-      select: {
-        id: true, studentNumber: true, fullName: true, email: true, phone: true,
-        profileImageUrl: true, isActive: true, emailVerified: true, createdAt: true,
-      },
-    });
+    const student = await this.prisma.student.findUnique({ where: { id }, select: STUDENT_SELECT });
     if (!student) throw new NotFoundException('Student not found');
     return student;
   }
 
   async update(id: string, dto: UpdateStudentDto) {
     await this.findOne(id);
-    return this.prisma.student.update({ where: { id }, data: dto });
+    return this.prisma.student.update({ where: { id }, data: dto, select: STUDENT_SELECT });
   }
 
   async deactivate(id: string) {
     await this.findOne(id);
-    return this.prisma.student.update({ where: { id }, data: { isActive: false } });
+    return this.prisma.student.update({ where: { id }, data: { isActive: false }, select: STUDENT_SELECT });
+  }
+
+  async activate(id: string) {
+    await this.findOne(id);
+    return this.prisma.student.update({ where: { id }, data: { isActive: true }, select: STUDENT_SELECT });
   }
 
   async addFavouriteRoute(studentId: string, routeId: string) {

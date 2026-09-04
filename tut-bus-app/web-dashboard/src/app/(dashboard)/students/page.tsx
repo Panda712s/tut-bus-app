@@ -21,6 +21,11 @@ export default function StudentsPage() {
     load();
   }
 
+  async function handleActivate(id: string) {
+    await api.patch(`/students/${id}/activate`);
+    load();
+  }
+
   const filtered = students.filter(
     (s) =>
       s.fullName.toLowerCase().includes(search.toLowerCase()) ||
@@ -66,9 +71,13 @@ export default function StudentsPage() {
                 <td className="px-4 py-3">{s.emailVerified ? '✅' : '—'}</td>
                 <td className="px-4 py-3"><Badge value={s.isActive ? 'ACTIVE' : 'INACTIVE'} /></td>
                 <td className="px-4 py-3 text-right">
-                  {s.isActive && (
+                  {s.isActive ? (
                     <button onClick={() => handleDeactivate(s.id)} className="text-xs font-medium text-red-700 hover:underline">
                       Deactivate
+                    </button>
+                  ) : (
+                    <button onClick={() => handleActivate(s.id)} className="text-xs font-medium text-emerald-700 hover:underline">
+                      Activate
                     </button>
                   )}
                 </td>

@@ -17,6 +17,12 @@ const EMPTY_CREATE_FORM = {
   assignedBusId: '',
 };
 
+interface RevealedCredentials {
+  heading: string;
+  email: string;
+  password: string;
+}
+
 export default function DriversPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [buses, setBuses] = useState<Bus[]>([]);
@@ -26,6 +32,11 @@ export default function DriversPage() {
   const [editError, setEditError] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_CREATE_FORM);
   const [editForm, setEditForm] = useState({ fullName: '', phone: '', status: 'ACTIVE', assignedBusId: '' });
+  const [resettingPassword, setResettingPassword] = useState(false);
+  // Passwords are one-way hashed server-side and can never be looked up again -
+  // this holds the plaintext for the single response that just created or
+  // reset one, so the admin can copy it down before the modal closes.
+  const [revealed, setRevealed] = useState<RevealedCredentials | null>(null);
 
   function load() {
     api.get<Driver[]>('/drivers').then(setDrivers).catch((e) => setError(e.message));
@@ -52,12 +63,14 @@ export default function DriversPage() {
     e.preventDefault();
     setError(null);
     try {
-      await api.post('/drivers', {
+      const created = await api.post<Driver & { temporaryPassword: string }>('/drivers', {
         ...form,
+        password: form.password.trim() || undefined,
         assignedBusId: form.assignedBusId || undefined,
       });
       setOpen(false);
       setForm(EMPTY_CREATE_FORM);
+      setRevealed({ heading: `${created.fullName} was created`, email: created.email, password: created.temporaryPassword });
       load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to create driver');
@@ -93,8 +106,28 @@ export default function DriversPage() {
     }
   }
 
+  async function handleResetPassword() {
+    if (!editing) return;
+    setResettingPassword(true);
+    setEditError(null);
+    try {
+      const result = await api.patch<{ temporaryPassword: string }>(`/drivers/${editing.id}/reset-password`);
+      setEditing(null);
+      setRevealed({ heading: `New password for ${editing.fullName}`, email: editing.email, password: result.temporaryPassword });
+    } catch (err) {
+      setEditError(err instanceof ApiError ? err.message : 'Failed to reset password');
+    } finally {
+      setResettingPassword(false);
+    }
+  }
+
   async function handleDeactivate(id: string) {
     await api.patch(`/drivers/${id}/deactivate`);
+    load();
+  }
+
+  async function handleActivate(id: string) {
+    await api.patch(`/drivers/${id}/activate`);
     load();
   }
 
@@ -148,15 +181,19 @@ export default function DriversPage() {
                     <span className="text-ink-dim">Unassigned</span>
                   )}
                 </td>
-                <td className="px-4 py-3"><Badge value={d.status} /></td>
+                <td className="px-4 py-3"><Badge value={d.isActive ? d.status : 'DEACTIVATED'} /></td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-3">
                     <button onClick={() => openEdit(d)} className="text-xs font-medium text-accent hover:underline">
                       Edit
                     </button>
-                    {d.isActive && (
+                    {d.isActive ? (
                       <button onClick={() => handleDeactivate(d.id)} className="text-xs font-medium text-red-700 hover:underline">
                         Deactivate
+                      </button>
+                    ) : (
+                      <button onClick={() => handleActivate(d.id)} className="text-xs font-medium text-emerald-700 hover:underline">
+                        Activate
                       </button>
                     )}
                   </div>
@@ -185,8 +222,13 @@ export default function DriversPage() {
           <Field label="Email">
             <Input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           </Field>
-          <Field label="Temporary password">
-            <Input type="password" required minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+          <Field label="Temporary password (optional)">
+            <Input
+              minLength={8}
+              placeholder="Leave blank to auto-generate a secure one"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
           </Field>
           <Field label="License number">
             <Input required value={form.licenseNumber} onChange={(e) => setForm({ ...form, licenseNumber: e.target.value })} />
@@ -202,6 +244,9 @@ export default function DriversPage() {
               ))}
             </Select>
           </Field>
+          <p className="mb-3.5 text-xs leading-relaxed text-ink-dim">
+            You&apos;ll see this driver&apos;s password once, right after creating them — copy it down or share it with the driver then.
+          </p>
           <button type="submit" className="mt-2 w-full rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
             Create driver
           </button>
@@ -237,9 +282,82 @@ export default function DriversPage() {
             <button type="submit" className="mt-2 w-full rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
               Save changes
             </button>
+
+            <div className="mt-5 border-t border-line pt-4">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-ink-dim">Lost their password?</p>
+              <button
+                type="button"
+                disabled={resettingPassword}
+                onClick={handleResetPassword}
+                className="w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-ink-muted transition-colors hover:bg-accent/[0.06] hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {resettingPassword ? 'Generating new password…' : 'Reset password'}
+              </button>
+              <p className="mt-2 text-xs leading-relaxed text-ink-dim">
+                Generates a new random password and shows it to you once - the driver&apos;s current password stops working immediately.
+              </p>
+            </div>
           </form>
         )}
       </Modal>
+
+      <Modal open={!!revealed} onClose={() => setRevealed(null)} title={revealed?.heading ?? 'Credentials'}>
+        {revealed && <CredentialsReveal email={revealed.email} password={revealed.password} onDone={() => setRevealed(null)} />}
+      </Modal>
+    </div>
+  );
+}
+
+function CredentialsReveal({ email, password, onDone }: { email: string; password: string; onDone: () => void }) {
+  const [copied, setCopied] = useState<'email' | 'password' | null>(null);
+
+  async function copy(value: string, which: 'email' | 'password') {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(which);
+      setTimeout(() => setCopied((c) => (c === which ? null : c)), 1500);
+    } catch {
+      // Clipboard permission denied - the value is still visible to select/copy manually.
+    }
+  }
+
+  return (
+    <div>
+      <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-700">
+        This is the only time this password will be shown. Copy it down or send it to the driver now - if it&apos;s lost later, use <span className="font-semibold">Reset password</span> from that driver&apos;s Edit screen.
+      </p>
+
+      <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-ink-dim">Sign-in email</label>
+      <div className="mb-3.5 flex items-center gap-2">
+        <code className="flex-1 truncate rounded-xl border border-line bg-surface-inset px-3.5 py-2.5 text-sm text-ink">{email}</code>
+        <button
+          type="button"
+          onClick={() => copy(email, 'email')}
+          className="shrink-0 rounded-xl border border-line px-3 py-2.5 text-xs font-semibold text-ink-muted transition-colors hover:bg-accent/[0.06] hover:text-ink"
+        >
+          {copied === 'email' ? 'Copied ✓' : 'Copy'}
+        </button>
+      </div>
+
+      <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-ink-dim">Temporary password</label>
+      <div className="mb-4 flex items-center gap-2">
+        <code className="flex-1 truncate rounded-xl border border-accent/30 bg-accent/[0.06] px-3.5 py-2.5 text-sm font-semibold tracking-wide text-ink">{password}</code>
+        <button
+          type="button"
+          onClick={() => copy(password, 'password')}
+          className="shrink-0 rounded-xl border border-line px-3 py-2.5 text-xs font-semibold text-ink-muted transition-colors hover:bg-accent/[0.06] hover:text-ink"
+        >
+          {copied === 'password' ? 'Copied ✓' : 'Copy'}
+        </button>
+      </div>
+
+      <button
+        type="button"
+        onClick={onDone}
+        className="w-full rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]"
+      >
+        I&apos;ve saved this
+      </button>
     </div>
   );
 }

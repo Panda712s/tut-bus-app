@@ -71,4 +71,11 @@ export class StudentsController {
   deactivate(@Param('id') id: string) {
     return this.students.deactivate(id);
   }
+
+  @Patch(':id/activate')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  activate(@Param('id') id: string) {
+    return this.students.activate(id);
+  }
 }

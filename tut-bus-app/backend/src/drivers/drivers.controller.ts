@@ -74,4 +74,18 @@ export class DriversController {
   deactivate(@Param('id') id: string) {
     return this.drivers.deactivate(id);
   }
+
+  @Patch(':id/activate')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  activate(@Param('id') id: string) {
+    return this.drivers.activate(id);
+  }
+
+  @Patch(':id/reset-password')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  resetPassword(@Param('id') id: string) {
+    return this.drivers.resetPassword(id);
+  }
 }

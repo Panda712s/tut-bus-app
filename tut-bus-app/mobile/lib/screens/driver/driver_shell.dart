@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../l10n/app_l10n.dart';
 import 'driver_home_tab.dart';
+import 'driver_map_tab.dart';
 import 'driver_notifications_tab.dart';
 import 'driver_profile_tab.dart';
 
@@ -16,6 +17,7 @@ class _DriverShellState extends State<DriverShell> {
 
   final _tabs = const [
     DriverHomeTab(),
+    DriverMapTab(),
     DriverNotificationsTab(),
     DriverProfileTab(),
   ];
@@ -32,6 +34,10 @@ class _DriverShellState extends State<DriverShell> {
               icon: const Icon(Icons.dashboard_outlined),
               selectedIcon: const Icon(Icons.dashboard),
               label: AppL10n.of(context).t('nav.trip')),
+          NavigationDestination(
+              icon: const Icon(Icons.map_outlined),
+              selectedIcon: const Icon(Icons.map),
+              label: AppL10n.of(context).t('nav.map')),
           NavigationDestination(
               icon: const Icon(Icons.notifications_outlined),
               selectedIcon: const Icon(Icons.notifications),

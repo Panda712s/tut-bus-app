@@ -50,6 +50,11 @@ export default function BusesPage() {
     load();
   }
 
+  async function handleRecommission(id: string) {
+    await api.patch(`/buses/${id}`, { status: 'ACTIVE' });
+    load();
+  }
+
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
@@ -95,9 +100,15 @@ export default function BusesPage() {
                 <td className="px-4 py-3"><Badge value={b.status} /></td>
                 <td className="px-4 py-3"><Badge value={b.capacityState} /></td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleDecommission(b.id)} className="text-xs font-medium text-red-700 hover:underline">
-                    Decommission
-                  </button>
+                  {b.status === 'INACTIVE' ? (
+                    <button onClick={() => handleRecommission(b.id)} className="text-xs font-medium text-emerald-700 hover:underline">
+                      Recommission
+                    </button>
+                  ) : (
+                    <button onClick={() => handleDecommission(b.id)} className="text-xs font-medium text-red-700 hover:underline">
+                      Decommission
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

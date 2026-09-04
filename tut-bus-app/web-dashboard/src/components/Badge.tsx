@@ -7,6 +7,7 @@ const COLORS: Record<string, string> = {
   INACTIVE: 'bg-accent/[0.06] text-ink-muted ring-ink/10',
   MAINTENANCE: 'bg-amber-50 text-amber-700 ring-amber-600/20',
   SUSPENDED: 'bg-red-50 text-red-700 ring-red-600/20',
+  DEACTIVATED: 'bg-red-50 text-red-700 ring-red-600/20',
   EMPTY: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
   MODERATE: 'bg-amber-50 text-amber-700 ring-amber-600/20',
   FULL: 'bg-red-50 text-red-700 ring-red-600/20',
