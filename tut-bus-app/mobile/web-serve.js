@@ -42,6 +42,9 @@ const server = http.createServer((req, res) => {
     }
     const ext = path.extname(filePath).toLowerCase();
     res.setHeader('Content-Type', TYPES[ext] || 'application/octet-stream');
+    // Flutter web rebuilds keep the same file names (main.dart.js, etc.), so
+    // browsers must always revalidate instead of reusing a stale cached copy.
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     fs.createReadStream(filePath)
       .on('error', () => res.writeHead(500).end('Read error'))
       .pipe(res);

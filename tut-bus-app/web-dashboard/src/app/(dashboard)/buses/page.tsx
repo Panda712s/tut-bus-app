@@ -5,11 +5,12 @@ import { api, ApiError } from '@/lib/api';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
 import { Field, Input, Select } from '@/components/Field';
-import type { Bus, Route } from '@/lib/types';
+import type { Bus, Driver, Route } from '@/lib/types';
 
 export default function BusesPage() {
   const [buses, setBuses] = useState<Bus[]>([]);
   const [routes, setRoutes] = useState<Route[]>([]);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ busNumber: '', plateNumber: '', capacity: 60, currentRouteId: '' });
@@ -17,6 +18,11 @@ export default function BusesPage() {
   function load() {
     api.get<Bus[]>('/buses').then(setBuses).catch((e) => setError(e.message));
     api.get<Route[]>('/routes').then(setRoutes).catch(() => undefined);
+    api.get<Driver[]>('/drivers').then(setDrivers).catch(() => undefined);
+  }
+
+  function driverFor(busId: string) {
+    return drivers.find((d) => d.isActive && d.assignedBusId === busId) ?? null;
   }
 
   useEffect(load, []);
@@ -65,6 +71,7 @@ export default function BusesPage() {
               <th className="px-4 py-3">Bus #</th>
               <th className="px-4 py-3">Plate</th>
               <th className="px-4 py-3">Route</th>
+              <th className="px-4 py-3">Driver</th>
               <th className="px-4 py-3">Capacity</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Load</th>
@@ -77,6 +84,13 @@ export default function BusesPage() {
                 <td className="px-4 py-3 font-medium text-ink">{b.busNumber}</td>
                 <td className="px-4 py-3 text-ink-muted">{b.plateNumber}</td>
                 <td className="px-4 py-3 text-ink-muted">{b.currentRoute?.name ?? '—'}</td>
+                <td className="px-4 py-3">
+                  {driverFor(b.id) ? (
+                    <span className="text-ink-muted">{driverFor(b.id)!.fullName}</span>
+                  ) : (
+                    <span className="text-ink-dim">No driver assigned</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-ink-muted">{b.passengerCount}/{b.capacity}</td>
                 <td className="px-4 py-3"><Badge value={b.status} /></td>
                 <td className="px-4 py-3"><Badge value={b.capacityState} /></td>
@@ -89,7 +103,7 @@ export default function BusesPage() {
             ))}
             {buses.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-ink-dim">
+                <td colSpan={8} className="px-4 py-6 text-center text-ink-dim">
                   No buses yet.
                 </td>
               </tr>

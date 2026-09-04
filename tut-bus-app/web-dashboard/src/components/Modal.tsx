@@ -1,6 +1,7 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 export function Modal({
   open,
@@ -13,6 +14,14 @@ export function Modal({
   title: string;
   children: ReactNode;
 }) {
+  // Portal to document.body so the dialog is always positioned against the
+  // real viewport - it must not render inside the per-page `animate-fade-in`
+  // wrapper, whose transform keyframes make it a CSS containing block for
+  // `position: fixed` descendants and would otherwise squash/clip the modal
+  // into that page's content box instead of centering it on screen.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
@@ -27,9 +36,9 @@ export function Modal({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4 backdrop-blur-sm animate-backdrop-in"
       onClick={onClose}
@@ -38,10 +47,10 @@ export function Modal({
       aria-label={title}
     >
       <div
-        className="w-full max-w-lg rounded-2xl bg-surface p-6 shadow-xl animate-scale-in"
+        className="flex max-h-[88vh] w-full max-w-lg flex-col rounded-2xl bg-surface shadow-xl animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between">
+        <div className="flex shrink-0 items-center justify-between border-b border-line px-6 py-4">
           <h2 className="text-lg font-semibold text-ink">{title}</h2>
           <button
             onClick={onClose}
@@ -51,8 +60,9 @@ export function Modal({
             ✕
           </button>
         </div>
-        {children}
+        <div className="overflow-y-auto px-6 py-5">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

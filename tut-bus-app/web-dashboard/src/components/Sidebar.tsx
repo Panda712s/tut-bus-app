@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { href: '/live-map', label: 'Live Map', icon: '🗺️' },
   { href: '/operations', label: 'Operations', icon: '🛰️' },
   { href: '/buses', label: 'Buses', icon: '🚌' },
-  { href: '/drivers', label: 'Drivers', icon: '🧑‍✈️' },
+  { href: '/drivers', label: 'Drivers', icon: '🪪' },
   { href: '/routes', label: 'Routes & Stops', icon: '🛣️' },
   { href: '/schedules', label: 'Schedules', icon: '🕒' },
   { href: '/students', label: 'Students', icon: '🎓' },
