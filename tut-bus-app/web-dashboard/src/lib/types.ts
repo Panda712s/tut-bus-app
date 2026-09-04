@@ -30,6 +30,7 @@ export interface Driver {
   email: string;
   phone?: string | null;
   licenseNumber: string;
+  profileImageUrl?: string | null;
   status: 'ACTIVE' | 'INACTIVE' | 'ON_TRIP' | 'SUSPENDED';
   isActive: boolean;
   assignedBusId?: string | null;

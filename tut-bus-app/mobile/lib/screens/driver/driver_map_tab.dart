@@ -5,6 +5,7 @@ import '../../models/transport_models.dart';
 import '../../services/driver_repository.dart';
 import '../../services/socket_service.dart';
 import '../../services/transport_repository.dart';
+import '../../widgets/animated_map_controller.dart';
 
 // Default camera centred on the TUT Pretoria campus area.
 const _defaultCenter = LatLng(-25.7461, 28.1881);
@@ -20,11 +21,12 @@ class DriverMapTab extends StatefulWidget {
   State<DriverMapTab> createState() => _DriverMapTabState();
 }
 
-class _DriverMapTabState extends State<DriverMapTab> {
+class _DriverMapTabState extends State<DriverMapTab> with SingleTickerProviderStateMixin {
   final _gpsSocket = GpsSocketService();
   final _transportRepo = TransportRepository();
   final _driverRepo = DriverRepository();
   final _mapController = MapController();
+  late final _animatedMap = AnimatedMapController(mapController: _mapController, vsync: this);
   final Map<String, LiveBus> _buses = {};
   String? _myBusId;
   bool _centeredOnMe = false;
@@ -87,21 +89,22 @@ class _DriverMapTabState extends State<DriverMapTab> {
     final mine = _buses[_myBusId];
     if (mine?.lat == null || mine?.lng == null) return;
     _centeredOnMe = true;
-    _mapController.move(LatLng(mine!.lat!, mine.lng!), 15);
+    _animatedMap.animateTo(dest: LatLng(mine!.lat!, mine.lng!), zoom: 15);
   }
 
   void _recenter() {
     final mine = _myBusId != null ? _buses[_myBusId] : null;
     if (mine?.lat != null && mine?.lng != null) {
-      _mapController.move(LatLng(mine!.lat!, mine.lng!), 15);
+      _animatedMap.animateTo(dest: LatLng(mine!.lat!, mine.lng!), zoom: 15);
     } else {
-      _mapController.move(_defaultCenter, _defaultZoom);
+      _animatedMap.animateTo(dest: _defaultCenter, zoom: _defaultZoom);
     }
   }
 
   @override
   void dispose() {
     _gpsSocket.dispose();
+    _animatedMap.dispose();
     _mapController.dispose();
     super.dispose();
   }
@@ -176,13 +179,18 @@ class _DriverMapTabState extends State<DriverMapTab> {
       appBar: AppBar(
         title: const Text('Road Map'),
         actions: [
-          if (activeCount > 0)
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Center(
-                child: Text('$activeCount live', style: const TextStyle(fontSize: 13, color: Color(0xFF8A90A2))),
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: activeCount > 0
+                    ? Text('$activeCount live',
+                        key: ValueKey(activeCount), style: const TextStyle(fontSize: 13, color: Color(0xFF8A90A2)))
+                    : const SizedBox.shrink(key: ValueKey('none')),
               ),
             ),
+          ),
         ],
       ),
       body: Stack(
@@ -207,13 +215,18 @@ class _DriverMapTabState extends State<DriverMapTab> {
               ),
             ],
           ),
-          if (_buses.isEmpty)
-            const Positioned(
-              left: 0,
-              right: 0,
-              bottom: 24,
-              child: Center(child: _MapHint(text: 'No buses are on the road right now.')),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 24,
+            child: Center(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: _buses.isEmpty ? 1 : 0,
+                child: const IgnorePointer(child: _MapHint(text: 'No buses are on the road right now.')),
+              ),
             ),
+          ),
           Positioned(
             right: 16,
             bottom: 24,

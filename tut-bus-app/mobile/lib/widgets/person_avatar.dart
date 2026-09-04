@@ -2,18 +2,18 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
-/// Circular student avatar. Renders [imageUrl] (an https URL or a
-/// `data:image/...;base64,...` URI) when present, otherwise the first
+/// Circular avatar for a student or driver. Renders [imageUrl] (an https URL
+/// or a `data:image/...;base64,...` URI) when present, otherwise the first
 /// letter of [name] on a TUT-blue background.
-class StudentAvatar extends StatelessWidget {
-  const StudentAvatar({super.key, this.imageUrl, required this.name, this.radius = 38});
+class PersonAvatar extends StatelessWidget {
+  const PersonAvatar({super.key, this.imageUrl, required this.name, this.radius = 38});
 
   final String? imageUrl;
   final String name;
   final double radius;
 
   static Uint8List? _decodeDataUri(String url) {
-    final marker = 'base64,';
+    const marker = 'base64,';
     final i = url.indexOf(marker);
     if (i == -1) return null;
     try {

@@ -8,7 +8,7 @@ import { ReportIncidentDto } from './dto/report-incident.dto';
 
 const DRIVER_SELECT = {
   id: true, employeeNumber: true, fullName: true, email: true, phone: true,
-  licenseNumber: true, status: true, isActive: true, assignedBusId: true, createdAt: true,
+  licenseNumber: true, profileImageUrl: true, status: true, isActive: true, assignedBusId: true, createdAt: true,
 };
 
 @Injectable()

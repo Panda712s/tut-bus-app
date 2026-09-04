@@ -12,6 +12,15 @@ class DriverRepository {
     return DriverProfile.fromJson(json as Map<String, dynamic>);
   }
 
+  Future<DriverProfile> updateMyProfile({String? fullName, String? phone, String? profileImageUrl}) async {
+    final json = await _api.patch('/drivers/me', {
+      if (fullName != null) 'fullName': fullName,
+      if (phone != null) 'phone': phone,
+      if (profileImageUrl != null) 'profileImageUrl': profileImageUrl,
+    });
+    return DriverProfile.fromJson(json as Map<String, dynamic>);
+  }
+
   Future<Map<String, dynamic>> startTrip({required String busId, required String routeId}) async {
     final json = await _api.post('/trips/start', {'busId': busId, 'routeId': routeId});
     return json as Map<String, dynamic>;

@@ -4,9 +4,11 @@ import '../../models/user_models.dart';
 import '../../services/driver_repository.dart';
 import '../../state/auth_state.dart';
 import '../../l10n/app_l10n.dart';
+import '../../widgets/person_avatar.dart';
 import '../../widgets/state_views.dart';
 import '../../widgets/tut_background.dart';
 import '../settings/settings_screen.dart';
+import 'driver_edit_profile_screen.dart';
 import 'driver_incident_screen.dart';
 
 class DriverProfileTab extends StatefulWidget {
@@ -56,13 +58,10 @@ class _DriverProfileTabState extends State<DriverProfileTab> {
                         shape: BoxShape.circle,
                         border: Border.all(color: const Color(0x330A5796), width: 2),
                       ),
-                      child: CircleAvatar(
+                      child: PersonAvatar(
+                        imageUrl: _profile?.profileImageUrl,
+                        name: _profile?.fullName ?? '',
                         radius: 38,
-                        backgroundColor: const Color(0xFF0A5796),
-                        child: Text(
-                          (_profile?.fullName.isNotEmpty ?? false) ? _profile!.fullName[0].toUpperCase() : '?',
-                          style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
-                        ),
                       ),
                     ),
                   ),
@@ -92,6 +91,16 @@ class _DriverProfileTabState extends State<DriverProfileTab> {
                   const _GroupLabel('Manage'),
                   _CardGroup(
                     children: [
+                      _NavRow(
+                        icon: Icons.edit_outlined,
+                        label: 'Edit profile',
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => DriverEditProfileScreen(profile: _profile)),
+                          );
+                          _load();
+                        },
+                      ),
                       _NavRow(
                         icon: Icons.report_problem_outlined,
                         label: 'Report an issue',

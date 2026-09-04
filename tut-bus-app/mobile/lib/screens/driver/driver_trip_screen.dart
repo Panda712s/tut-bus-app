@@ -5,10 +5,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import '../../models/transport_models.dart';
 import '../../services/driver_repository.dart';
+import '../../services/eta_repository.dart';
 import '../../services/location_service.dart';
 import '../../services/safety_repository.dart';
 import '../../services/socket_service.dart';
 import '../../services/transport_repository.dart';
+import '../../widgets/animated_map_controller.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/rating_sheet.dart';
 import '../../widgets/sos_button.dart';
@@ -28,23 +30,30 @@ class DriverTripScreen extends StatefulWidget {
   State<DriverTripScreen> createState() => _DriverTripScreenState();
 }
 
-class _DriverTripScreenState extends State<DriverTripScreen> {
+class _DriverTripScreenState extends State<DriverTripScreen> with SingleTickerProviderStateMixin {
   final _driverRepo = DriverRepository();
   final _locationService = LocationService();
   final _gpsPublisher = DriverGpsPublisher();
   final _safety = SafetyRepository();
   final _transportRepo = TransportRepository();
+  final _etaRepo = EtaRepository();
   final _mapController = MapController();
+  late final _animatedMap = AnimatedMapController(mapController: _mapController, vsync: this);
 
   late final String _tripId = widget.trip['id'] as String;
+  late final String? _routeId =
+      widget.trip['routeId'] as String? ?? (widget.trip['route'] as Map?)?['id'] as String?;
   late String _status = widget.trip['status'] as String;
   int _passengerCount = 0;
   StreamSubscription<Position>? _positionSub;
   Timer? _statusTicker;
+  Timer? _etaTicker;
   Position? _lastPosition;
   bool _sharingLocation = false;
   bool _busy = false;
   List<BusStop> _stops = [];
+  List<StopEtaEntry> _upcomingStops = [];
+  bool _loadingEta = true;
   bool _mapFollows = true;
 
   @override
@@ -52,20 +61,35 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
     super.initState();
     _startSharingIfPossible();
     _loadRoute();
+    _loadEta();
     // Keep the "queued pings" indicator fresh while offline.
     _statusTicker = Timer.periodic(const Duration(seconds: 3), (_) {
       if (mounted) setState(() {});
     });
+    // Refresh how-far-to-each-stop periodically as the bus moves along the route.
+    _etaTicker = Timer.periodic(const Duration(seconds: 20), (_) => _loadEta());
   }
 
   Future<void> _loadRoute() async {
-    final routeId = widget.trip['routeId'] as String? ?? (widget.trip['route'] as Map?)?['id'] as String?;
-    if (routeId == null) return;
+    if (_routeId == null) return;
     try {
-      final route = await _transportRepo.fetchRoute(routeId);
+      final route = await _transportRepo.fetchRoute(_routeId);
       if (mounted) setState(() => _stops = route.stops);
     } catch (_) {
       // The trip still works without the stop overlay on the map.
+    }
+  }
+
+  Future<void> _loadEta() async {
+    if (_routeId == null) return;
+    try {
+      final buses = await _etaRepo.forRoute(_routeId);
+      final mine = buses.where((b) => b.busId == widget.busId);
+      if (mounted) setState(() => _upcomingStops = mine.isNotEmpty ? mine.first.stops : []);
+    } catch (_) {
+      // Non-fatal - the map and trip controls still work without ETAs.
+    } finally {
+      if (mounted) setState(() => _loadingEta = false);
     }
   }
 
@@ -93,7 +117,11 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
       );
       if (mounted) setState(() {});
       if (_mapFollows) {
-        _mapController.move(LatLng(position.latitude, position.longitude), _mapController.camera.zoom);
+        _animatedMap.animateTo(
+          dest: LatLng(position.latitude, position.longitude),
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOut,
+        );
       }
     });
   }
@@ -101,8 +129,10 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
   @override
   void dispose() {
     _statusTicker?.cancel();
+    _etaTicker?.cancel();
     _positionSub?.cancel();
     _gpsPublisher.dispose();
+    _animatedMap.dispose();
     _mapController.dispose();
     super.dispose();
   }
@@ -267,21 +297,32 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
                     ),
                   ],
                 ),
-                if (!_mapFollows)
-                  Positioned(
-                    right: 12,
-                    bottom: 12,
-                    child: FloatingActionButton.small(
-                      heroTag: 'driver-trip-recentre',
-                      onPressed: () {
-                        setState(() => _mapFollows = true);
-                        if (me != null) _mapController.move(me, 15);
-                      },
-                      backgroundColor: Colors.white,
-                      foregroundColor: _accent,
-                      child: const Icon(Icons.my_location_rounded),
+                Positioned(
+                  right: 12,
+                  bottom: 12,
+                  child: AnimatedSlide(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOut,
+                    offset: _mapFollows ? const Offset(0, 1.4) : Offset.zero,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 220),
+                      opacity: _mapFollows ? 0 : 1,
+                      child: IgnorePointer(
+                        ignoring: _mapFollows,
+                        child: FloatingActionButton.small(
+                          heroTag: 'driver-trip-recentre',
+                          onPressed: () {
+                            setState(() => _mapFollows = true);
+                            if (me != null) _animatedMap.animateTo(dest: me, zoom: 15);
+                          },
+                          backgroundColor: Colors.white,
+                          foregroundColor: _accent,
+                          child: const Icon(Icons.my_location_rounded),
+                        ),
+                      ),
                     ),
                   ),
+                ),
               ],
             ),
           ),
@@ -302,14 +343,25 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(
-                            _sharingLocation ? Icons.gps_fixed_rounded : Icons.gps_off_rounded,
-                            color: _sharingLocation ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
-                            size: 20,
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                            child: Icon(
+                              _sharingLocation ? Icons.gps_fixed_rounded : Icons.gps_off_rounded,
+                              key: ValueKey(_sharingLocation),
+                              color: _sharingLocation ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                              size: 20,
+                            ),
                           ),
                           const SizedBox(width: 8),
-                          Text(_sharingLocation ? 'Sharing live location' : 'Location not shared',
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 250),
+                            child: Text(
+                              _sharingLocation ? 'Sharing live location' : 'Location not shared',
+                              key: ValueKey(_sharingLocation),
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -341,6 +393,8 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                _EtaCard(loading: _loadingEta, stops: _upcomingStops),
+                const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
@@ -358,7 +412,18 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
                           IconButton.filledTonal(onPressed: () => _updatePassengers(-1), icon: const Icon(Icons.remove)),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 22),
-                            child: Text('$_passengerCount', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              transitionBuilder: (child, anim) => ScaleTransition(
+                                scale: anim,
+                                child: FadeTransition(opacity: anim, child: child),
+                              ),
+                              child: Text(
+                                '$_passengerCount',
+                                key: ValueKey(_passengerCount),
+                                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+                              ),
+                            ),
                           ),
                           IconButton.filledTonal(onPressed: () => _updatePassengers(1), icon: const Icon(Icons.add)),
                         ],
@@ -367,10 +432,29 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
                   ),
                 ),
                 const SizedBox(height: 22),
-                if (_status == 'IN_PROGRESS')
-                  PrimaryButton(label: 'Pause trip', loading: _busy, color: const Color(0xFFF59E0B), onPressed: _pause)
-                else if (_status == 'PAUSED')
-                  PrimaryButton(label: 'Resume trip', loading: _busy, onPressed: _resume),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  transitionBuilder: (child, anim) => FadeTransition(
+                    opacity: anim,
+                    child: SizeTransition(sizeFactor: anim, child: child),
+                  ),
+                  child: _status == 'IN_PROGRESS'
+                      ? PrimaryButton(
+                          key: const ValueKey('pause'),
+                          label: 'Pause trip',
+                          loading: _busy,
+                          color: const Color(0xFFF59E0B),
+                          onPressed: _pause,
+                        )
+                      : _status == 'PAUSED'
+                          ? PrimaryButton(
+                              key: const ValueKey('resume'),
+                              label: 'Resume trip',
+                              loading: _busy,
+                              onPressed: _resume,
+                            )
+                          : const SizedBox.shrink(key: ValueKey('none')),
+                ),
                 const SizedBox(height: 10),
                 PrimaryButton(label: 'End trip', loading: _busy, color: const Color(0xFF262B3A), onPressed: _end),
                 const SizedBox(height: 10),
@@ -386,6 +470,127 @@ class _DriverTripScreenState extends State<DriverTripScreen> {
                   label: const Text('Report traffic / accident / breakdown'),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Estimated arrival time at each stop still ahead on the route, computed
+/// from this bus's live position and speed - so the driver can see how far
+/// behind or ahead of schedule they're running without checking a phone map.
+class _EtaCard extends StatelessWidget {
+  const _EtaCard({required this.loading, required this.stops});
+
+  final bool loading;
+  final List<StopEtaEntry> stops;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0x0D0A5796),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x260A5796)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
+            child: Row(
+              children: [
+                Container(
+                  height: 30,
+                  width: 30,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: const Color(0x1F0A5796), borderRadius: BorderRadius.circular(9)),
+                  child: const Icon(Icons.timer_outlined, size: 16, color: _accent),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text('Upcoming stops', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5)),
+                ),
+              ],
+            ),
+          ),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 280),
+            child: loading
+                ? const Padding(
+                    key: ValueKey('loading'),
+                    padding: EdgeInsets.fromLTRB(14, 4, 14, 16),
+                    child: SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : stops.isEmpty
+                    ? const Padding(
+                        key: ValueKey('empty'),
+                        padding: EdgeInsets.fromLTRB(14, 0, 14, 16),
+                        child: Text(
+                          'No estimate yet - this needs a live GPS fix and at least one stop ahead on the route.',
+                          style: TextStyle(fontSize: 12.5, color: _muted, height: 1.35),
+                        ),
+                      )
+                    : Column(
+                        key: const ValueKey('stops'),
+                        children: [
+                          for (var i = 0; i < stops.length; i++) ...[
+                            if (i != 0) const Divider(height: 1, color: Color(0x1A0A5796)),
+                            _EtaRow(stop: stops[i]),
+                          ],
+                          const SizedBox(height: 6),
+                        ],
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EtaRow extends StatelessWidget {
+  const _EtaRow({required this.stop});
+
+  final StopEtaEntry stop;
+
+  @override
+  Widget build(BuildContext context) {
+    final arriving = stop.label == 'now';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+      child: Row(
+        children: [
+          Container(
+            height: 30,
+            width: 30,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(9)),
+            child: const Icon(Icons.location_on_outlined, size: 16, color: Color(0xFFFAB416)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(stop.stopName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: arriving ? const Color(0x1F16A34A) : const Color(0x1F0A5796),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              arriving ? 'Arriving' : stop.label,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+                color: arriving ? const Color(0xFF15803D) : _accent,
+              ),
             ),
           ),
         ],

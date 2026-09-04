@@ -6,6 +6,7 @@ import '../../services/transport_repository.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/state_views.dart';
 import '../../widgets/tut_background.dart';
+import '../../widgets/weather_card.dart';
 import 'driver_trip_screen.dart';
 
 const _accent = Color(0xFF0A5796);
@@ -89,63 +90,78 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
         ],
       ),
       body: TutBackground(
-        child: _loading
-            ? const LoadingView()
-            : _error != null
-                ? ErrorView(message: _error!, onRetry: _load)
-                : RefreshIndicator(
-                    onRefresh: _load,
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Hi, ${_profile?.fullName.split(' ').first ?? 'Driver'} 👋',
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.4),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    "Here's your shift for today.",
-                                    style: TextStyle(color: _muted, fontSize: 13.5),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            _StatusPill(status: _profile?.status ?? '—'),
-                          ],
-                        ),
-                        const SizedBox(height: 22),
-                        if (_profile?.assignedBusId == null)
-                          const _EmptyBusCard()
-                        else if (_activeTrip != null)
-                          _ActiveTripCard(
-                            status: _activeTrip!['status'] as String,
-                            onResume: () async {
-                              await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => DriverTripScreen(trip: _activeTrip!, busId: _profile!.assignedBusId!),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 280),
+          child: _loading
+              ? const LoadingView(key: ValueKey('loading'))
+              : _error != null
+                  ? ErrorView(key: const ValueKey('error'), message: _error!, onRetry: _load)
+                  : RefreshIndicator(
+                      key: const ValueKey('content'),
+                      onRefresh: _load,
+                      child: ListView(
+                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Hi, ${_profile?.fullName.split(' ').first ?? 'Driver'} 👋',
+                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.4),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      "Here's your shift for today.",
+                                      style: TextStyle(color: _muted, fontSize: 13.5),
+                                    ),
+                                  ],
                                 ),
-                              );
-                              _load();
-                            },
-                          )
-                        else
-                          _StartTripCard(
-                            routes: _routes,
-                            selectedRouteId: _selectedRouteId,
-                            onRouteChanged: (v) => setState(() => _selectedRouteId = v),
-                            starting: _starting,
-                            onStart: _startTrip,
+                              ),
+                              _StatusPill(status: _profile?.status ?? '—'),
+                            ],
                           ),
-                      ],
+                          const SizedBox(height: 20),
+                          const WeatherCard(footer: 'Clear roads reported on your route.'),
+                          const SizedBox(height: 22),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 280),
+                            transitionBuilder: (child, anim) => FadeTransition(
+                              opacity: anim,
+                              child: SizeTransition(sizeFactor: anim, child: child),
+                            ),
+                            child: _profile?.assignedBusId == null
+                                ? const _EmptyBusCard(key: ValueKey('no-bus'))
+                                : _activeTrip != null
+                                    ? _ActiveTripCard(
+                                        key: const ValueKey('active-trip'),
+                                        status: _activeTrip!['status'] as String,
+                                        onResume: () async {
+                                          await Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  DriverTripScreen(trip: _activeTrip!, busId: _profile!.assignedBusId!),
+                                            ),
+                                          );
+                                          _load();
+                                        },
+                                      )
+                                    : _StartTripCard(
+                                        key: const ValueKey('start-trip'),
+                                        routes: _routes,
+                                        selectedRouteId: _selectedRouteId,
+                                        onRouteChanged: (v) => setState(() => _selectedRouteId = v),
+                                        starting: _starting,
+                                        onStart: _startTrip,
+                                      ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+        ),
       ),
     );
   }
@@ -172,7 +188,7 @@ class _StatusPill extends StatelessWidget {
 }
 
 class _EmptyBusCard extends StatelessWidget {
-  const _EmptyBusCard();
+  const _EmptyBusCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +223,7 @@ class _EmptyBusCard extends StatelessWidget {
 }
 
 class _ActiveTripCard extends StatelessWidget {
-  const _ActiveTripCard({required this.status, required this.onResume});
+  const _ActiveTripCard({super.key, required this.status, required this.onResume});
   final String status;
   final VoidCallback onResume;
 
@@ -260,6 +276,7 @@ class _ActiveTripCard extends StatelessWidget {
 
 class _StartTripCard extends StatelessWidget {
   const _StartTripCard({
+    super.key,
     required this.routes,
     required this.selectedRouteId,
     required this.onRouteChanged,

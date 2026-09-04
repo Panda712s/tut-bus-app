@@ -2,23 +2,22 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/user_models.dart';
-import '../../services/student_repository.dart';
-import '../../widgets/primary_button.dart';
+import '../../services/driver_repository.dart';
 import '../../widgets/person_avatar.dart';
+import '../../widgets/primary_button.dart';
 
-class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key, required this.profile});
+class DriverEditProfileScreen extends StatefulWidget {
+  const DriverEditProfileScreen({super.key, required this.profile});
 
-  final StudentProfile? profile;
+  final DriverProfile? profile;
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  State<DriverEditProfileScreen> createState() => _DriverEditProfileScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
-  final _repo = StudentRepository();
+class _DriverEditProfileScreenState extends State<DriverEditProfileScreen> {
+  final _repo = DriverRepository();
   late final _nameController = TextEditingController(text: widget.profile?.fullName ?? '');
-  late final _phoneController = TextEditingController(text: widget.profile?.phone ?? '');
   late String? _imageUrl = widget.profile?.profileImageUrl;
   bool _loading = false;
   bool _picking = false;
@@ -26,7 +25,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _phoneController.dispose();
     super.dispose();
   }
 
@@ -61,7 +59,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       await _repo.updateMyProfile(
         fullName: _nameController.text.trim(),
-        phone: _phoneController.text.trim(),
         profileImageUrl: _imageUrl,
       );
       if (mounted) Navigator.of(context).pop();
@@ -136,15 +133,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             decoration: const InputDecoration(
               labelText: 'Full name',
               prefixIcon: Icon(Icons.person_outline_rounded),
-            ),
-          ),
-          const SizedBox(height: 14),
-          TextField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(
-              labelText: 'Phone',
-              prefixIcon: Icon(Icons.phone_outlined),
             ),
           ),
           const SizedBox(height: 24),

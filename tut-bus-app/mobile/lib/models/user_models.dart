@@ -86,6 +86,7 @@ class DriverProfile {
   final String email;
   final String status;
   final String? assignedBusId;
+  final String? profileImageUrl;
 
   DriverProfile({
     required this.id,
@@ -94,6 +95,7 @@ class DriverProfile {
     required this.email,
     required this.status,
     this.assignedBusId,
+    this.profileImageUrl,
   });
 
   factory DriverProfile.fromJson(Map<String, dynamic> json) => DriverProfile(
@@ -103,5 +105,6 @@ class DriverProfile {
         email: json['email'] as String,
         status: json['status'] as String? ?? 'ACTIVE',
         assignedBusId: json['assignedBusId'] as String?,
+        profileImageUrl: json['profileImageUrl'] as String?,
       );
 }

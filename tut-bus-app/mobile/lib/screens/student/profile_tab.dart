@@ -5,7 +5,7 @@ import '../../services/student_repository.dart';
 import '../../state/auth_state.dart';
 import '../../l10n/app_l10n.dart';
 import '../../widgets/state_views.dart';
-import '../../widgets/student_avatar.dart';
+import '../../widgets/person_avatar.dart';
 import '../../widgets/tut_background.dart';
 import '../settings/settings_screen.dart';
 import 'trip_history_screen.dart';
@@ -59,7 +59,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         shape: BoxShape.circle,
                         border: Border.all(color: const Color(0x330A5796), width: 2),
                       ),
-                      child: StudentAvatar(
+                      child: PersonAvatar(
                         imageUrl: _profile?.profileImageUrl,
                         name: _profile?.fullName ?? '',
                         radius: 38,

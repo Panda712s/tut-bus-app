@@ -171,7 +171,12 @@ export default function DriversPage() {
             {drivers.map((d) => (
               <tr key={d.id}>
                 <td className="px-4 py-3 font-medium text-ink">{d.employeeNumber}</td>
-                <td className="px-4 py-3 text-ink-muted">{d.fullName}</td>
+                <td className="px-4 py-3 text-ink-muted">
+                  <div className="flex items-center gap-2.5">
+                    <DriverAvatar name={d.fullName} imageUrl={d.profileImageUrl} />
+                    <span>{d.fullName}</span>
+                  </div>
+                </td>
                 <td className="px-4 py-3 text-ink-muted">{d.email}</td>
                 <td className="px-4 py-3 text-ink-muted">{d.licenseNumber}</td>
                 <td className="px-4 py-3">
@@ -358,6 +363,22 @@ function CredentialsReveal({ email, password, onDone }: { email: string; passwor
       >
         I&apos;ve saved this
       </button>
+    </div>
+  );
+}
+
+/** Small round avatar for the drivers table - reflects whatever photo the
+ * driver has set on their own profile in the mobile app, since it's the
+ * same underlying record the admin is reading here. */
+function DriverAvatar({ name, imageUrl }: { name: string; imageUrl?: string | null }) {
+  if (imageUrl) {
+    // eslint-disable-next-line @next/next/no-img-element -- data: URIs, not a Next-optimizable remote image
+    return <img src={imageUrl} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />;
+  }
+  const initial = name.trim().charAt(0).toUpperCase() || '?';
+  return (
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-grad text-xs font-bold text-white">
+      {initial}
     </div>
   );
 }
