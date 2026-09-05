@@ -17,6 +17,7 @@ import {
   IconGraduationCap,
   IconBell,
   IconChat,
+  IconHistory,
   IconLogout,
 } from '@/components/icons';
 
@@ -31,6 +32,7 @@ const NAV_ITEMS = [
   { href: '/students', label: 'Students', icon: IconGraduationCap },
   { href: '/notifications', label: 'Notifications', icon: IconBell },
   { href: '/feedback', label: 'Feedback', icon: IconChat },
+  { href: '/activity', label: 'Activity', icon: IconHistory },
 ];
 
 export function Sidebar() {

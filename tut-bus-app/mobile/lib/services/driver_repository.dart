@@ -21,6 +21,12 @@ class DriverRepository {
     return DriverProfile.fromJson(json as Map<String, dynamic>);
   }
 
+  Future<void> changeMyPassword({required String currentPassword, required String newPassword}) =>
+      _api.patch('/drivers/me/password', {
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      });
+
   Future<Map<String, dynamic>> startTrip({required String busId, required String routeId}) async {
     final json = await _api.post('/trips/start', {'busId': busId, 'routeId': routeId});
     return json as Map<String, dynamic>;

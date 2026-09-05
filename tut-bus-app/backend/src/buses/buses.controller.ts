@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@ne
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { CurrentUser, AuthenticatedUser } from '../common/decorators/current-user.decorator';
 import { Role } from '../common/enums/role.enum';
 import { BusesService } from './buses.service';
 import { CreateBusDto } from './dto/create-bus.dto';
@@ -14,8 +15,8 @@ export class BusesController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  create(@Body() dto: CreateBusDto) {
-    return this.buses.create(dto);
+  create(@Body() dto: CreateBusDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.buses.create(dto, user.id);
   }
 
   @Public()
@@ -53,7 +54,7 @@ export class BusesController {
   @Patch(':id/decommission')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  remove(@Param('id') id: string) {
-    return this.buses.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.buses.remove(id, user.id);
   }
 }

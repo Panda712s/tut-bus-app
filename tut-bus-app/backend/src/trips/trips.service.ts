@@ -1,7 +1,8 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { TripStatus } from '@prisma/client';
+import { NotificationAudience, NotificationType, TripStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 import { CreateTripDto } from './dto/create-trip.dto';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class TripsService {
   constructor(
     private prisma: PrismaService,
     private gateway: NotificationsGateway,
+    private notifications: NotificationsService,
   ) {}
 
   async findOne(id: string) {
@@ -47,6 +49,20 @@ export class TripsService {
     await this.prisma.driver.update({ where: { id: driverId }, data: { status: 'ON_TRIP' } });
 
     this.gateway.notifyRole('STUDENT', 'trip:started', { tripId: trip.id, busId: trip.busId, routeId: trip.routeId });
+
+    // Best-effort: also push to students who favourited this route, so they
+    // find out even if the app isn't open. Never let a notification hiccup
+    // fail the trip start itself.
+    this.notifications
+      .create({
+        title: 'Bus on the way',
+        body: `${trip.bus.busNumber} just started its trip on ${trip.route.name}.`,
+        type: NotificationType.BUS_DEPARTURE,
+        audience: NotificationAudience.ROUTE_STUDENTS,
+        routeId: trip.routeId,
+      })
+      .catch(() => undefined);
+
     return trip;
   }
 

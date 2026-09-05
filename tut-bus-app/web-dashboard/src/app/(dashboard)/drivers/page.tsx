@@ -8,6 +8,8 @@ import { Field, Input, Select } from '@/components/Field';
 import { DriverAvatar } from '@/components/DriverAvatar';
 import { CredentialsReveal } from '@/components/CredentialsReveal';
 import { useDrivers } from '@/hooks/useDrivers';
+import { downloadCsv } from '@/lib/csv';
+import { IconDownload } from '@/components/icons';
 import type { Bus, Driver } from '@/lib/types';
 
 const EMPTY_CREATE_FORM = {
@@ -121,6 +123,20 @@ export default function DriversPage() {
     await activate(id);
   }
 
+  function handleExport() {
+    downloadCsv(
+      'drivers.csv',
+      drivers.map((d) => ({
+        'Employee #': d.employeeNumber,
+        Name: d.fullName,
+        Email: d.email,
+        License: d.licenseNumber,
+        'Assigned bus': d.assignedBusId && busById.get(d.assignedBusId) ? busById.get(d.assignedBusId)!.busNumber : 'Unassigned',
+        Status: d.isActive ? d.status : 'DEACTIVATED',
+      })),
+    );
+  }
+
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
@@ -137,9 +153,19 @@ export default function DriversPage() {
             )}
           </p>
         </div>
-        <button onClick={() => setOpen(true)} className="rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
-          + Add driver
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExport}
+            disabled={drivers.length === 0}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-ink-muted transition-colors hover:bg-accent/[0.06] hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <IconDownload className="h-4 w-4" />
+            Export CSV
+          </button>
+          <button onClick={() => setOpen(true)} className="rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]">
+            + Add driver
+          </button>
+        </div>
       </div>
 
       {error && <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">{error}</p>}

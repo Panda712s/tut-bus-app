@@ -133,6 +133,7 @@ model Student {
   sosAlerts       SosAlert[]
   tripShares      TripShare[]
   tripRatings     TripRating[]
+  deviceTokens    DeviceToken[]
 
   @@map("students")
 }
@@ -159,6 +160,7 @@ model Driver {
   notifications   NotificationRecipient[]
   sosAlerts       SosAlert[]
   tripRatings     TripRating[]
+  deviceTokens    DeviceToken[]
 
   @@map("drivers")
 }
@@ -174,6 +176,7 @@ model Admin {
   updatedAt DateTime  @updatedAt
 
   notificationsSent Notification[]
+  auditLogs         AuditLog[]
 
   @@map("admins")
 }
@@ -374,6 +377,27 @@ model NotificationRecipient {
   @@map("notification_recipients")
 }
 
+/// A mobile device's push-notification token (FCM). Registered by the app on
+/// login and used to actually deliver notifications when the app isn't open
+/// (the socket-based inbox above only reaches a connected, foregrounded app).
+model DeviceToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  platform  String? // "android" | "ios" | "web"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentId String?
+  student   Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  driverId String?
+  driver   Driver? @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([driverId])
+  @@map("device_tokens")
+}
+
 // ---------- Feedback & incident reports ----------
 
 model Feedback {
@@ -536,6 +560,24 @@ model RouteDeviationAlert {
 
   @@index([status])
   @@map("route_deviation_alerts")
+}
+
+// ---------- Admin activity log (feature: audit trail) ----------
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  action     String // short verb-noun code, e.g. "driver.deactivate", "student.activate"
+  targetType String // "Driver" | "Student" | "Bus" | "Route" | "Notification" | ...
+  targetId   String?
+  summary    String // human-readable one-liner, e.g. "Deactivated driver Thabo Nkosi (DRV-001)"
+  createdAt  DateTime @default(now())
+
+  adminId String?
+  admin   Admin?  @relation(fields: [adminId], references: [id])
+
+  @@index([createdAt])
+  @@index([adminId])
+  @@map("audit_logs")
 }
 
 // ---------- Two-way trip ratings (feature: structured ratings) ----------

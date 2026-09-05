@@ -4,10 +4,18 @@ import { StatCard } from '@/components/StatCard';
 import { TripsPerDayChart } from '@/components/TripsPerDayChart';
 import { BusiestRoutesCard } from '@/components/BusiestRoutesCard';
 import { useOverview } from '@/hooks/useOverview';
+import { downloadCsv } from '@/lib/csv';
 import { IconGraduationCap, IconIdCard, IconBus, IconPulse, IconRoute, IconStar } from '@/components/icons';
 
 export default function OverviewPage() {
   const { overview, tripsPerDay, busiestRoutes, error } = useOverview();
+
+  function handleExportRoutes() {
+    downloadCsv(
+      'busiest-routes.csv',
+      busiestRoutes.map((r) => ({ 'Route name': r.name, 'Trip count': r.tripCount })),
+    );
+  }
 
   return (
     <div>
@@ -58,7 +66,7 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <TripsPerDayChart data={tripsPerDay} />
-        <BusiestRoutesCard routes={busiestRoutes} />
+        <BusiestRoutesCard routes={busiestRoutes} onExport={handleExportRoutes} />
       </div>
     </div>
   );

@@ -22,6 +22,7 @@ import { TrackingModule } from './tracking/tracking.module';
 import { SafetyModule } from './safety/safety.module';
 import { OpsModule } from './ops/ops.module';
 import { RatingsModule } from './ratings/ratings.module';
+import { AuditLogModule } from './audit/audit-log.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -49,6 +50,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     SafetyModule,
     OpsModule,
     RatingsModule,
+    AuditLogModule,
   ],
   providers: [
     // Every route requires a valid JWT unless explicitly marked with @Public().

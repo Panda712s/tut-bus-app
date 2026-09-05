@@ -153,6 +153,26 @@ export function IconMoon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconDownload(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M12 4v11.5" />
+      <path d="M7.5 11.5 12 16l4.5-4.5" />
+      <path d="M5 19.5h14" />
+    </Icon>
+  );
+}
+
+export function IconHistory(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M4 10a8 8 0 1 1 2.1 6.4" />
+      <path d="M4 5v5h5" />
+      <path d="M12 8.5V12l2.5 2" />
+    </Icon>
+  );
+}
+
 export function IconStar(props: SVGProps<SVGSVGElement>) {
   return (
     <Icon {...props}>

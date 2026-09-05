@@ -2,7 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '../common/enums/role.enum';
 import { AuthenticatedUser } from '../common/decorators/current-user.decorator';
+import { AuditLogService } from '../audit/audit-log.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
+import { RegisterDeviceTokenDto } from './dto/register-device-token.dto';
 import { NotificationsGateway } from './notifications.gateway';
 import { FcmService } from './fcm.service';
 
@@ -12,6 +14,7 @@ export class NotificationsService {
     private prisma: PrismaService,
     private gateway: NotificationsGateway,
     private fcm: FcmService,
+    private auditLog: AuditLogService,
   ) {}
 
   async create(dto: CreateNotificationDto, sentById?: string) {
@@ -48,9 +51,64 @@ export class NotificationsService {
       }
     }
 
-    await this.fcm.send([], notification.title, notification.body);
+    const deviceTokens = await this.deviceTokensFor(recipientIds.studentIds, recipientIds.driverIds);
+    if (deviceTokens.length) {
+      await this.fcm.send(deviceTokens, notification.title, notification.body, {
+        type: notification.type,
+        notificationId: notification.id,
+      });
+    }
+
+    // Only log when an admin actually sent this (sentById set) - system-
+    // triggered notifications (e.g. the automatic "Bus on the way" push from
+    // trips.service) are not admin actions.
+    if (sentById) {
+      this.auditLog
+        .log(
+          { id: sentById },
+          'notification.send',
+          'Notification',
+          notification.id,
+          `Sent notification "${notification.title}" to ${dto.audience.replace(/_/g, ' ').toLowerCase()}`,
+        )
+        .catch(() => undefined);
+    }
 
     return notification;
+  }
+
+  /** Upserts a device's push token, tied to whichever role is signed in.
+   * Re-registering the same token (e.g. every app launch) just refreshes it. */
+  async registerDeviceToken(user: AuthenticatedUser, dto: RegisterDeviceTokenDto) {
+    await this.prisma.deviceToken.upsert({
+      where: { token: dto.token },
+      create: {
+        token: dto.token,
+        platform: dto.platform,
+        studentId: user.role === Role.STUDENT ? user.id : undefined,
+        driverId: user.role === Role.DRIVER ? user.id : undefined,
+      },
+      update: {
+        platform: dto.platform,
+        studentId: user.role === Role.STUDENT ? user.id : null,
+        driverId: user.role === Role.DRIVER ? user.id : null,
+      },
+    });
+    return { success: true };
+  }
+
+  async unregisterDeviceToken(token: string) {
+    await this.prisma.deviceToken.deleteMany({ where: { token } });
+    return { success: true };
+  }
+
+  private async deviceTokensFor(studentIds: string[], driverIds: string[]): Promise<string[]> {
+    if (!studentIds.length && !driverIds.length) return [];
+    const rows = await this.prisma.deviceToken.findMany({
+      where: { OR: [{ studentId: { in: studentIds } }, { driverId: { in: driverIds } }] },
+      select: { token: true },
+    });
+    return rows.map((r) => r.token);
   }
 
   private async resolveRecipients(dto: CreateNotificationDto) {

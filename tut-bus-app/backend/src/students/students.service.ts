@@ -1,5 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditLogService } from '../audit/audit-log.service';
 import { UpdateStudentDto } from './dto/update-student.dto';
 
 const STUDENT_SELECT = {
@@ -9,7 +10,10 @@ const STUDENT_SELECT = {
 
 @Injectable()
 export class StudentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditLog: AuditLogService,
+  ) {}
 
   async findAll() {
     return this.prisma.student.findMany({
@@ -24,19 +28,53 @@ export class StudentsService {
     return student;
   }
 
-  async update(id: string, dto: UpdateStudentDto) {
+  async update(id: string, dto: UpdateStudentDto, adminId?: string) {
     await this.findOne(id);
-    return this.prisma.student.update({ where: { id }, data: dto, select: STUDENT_SELECT });
+    const student = await this.prisma.student.update({ where: { id }, data: dto, select: STUDENT_SELECT });
+
+    // Only log when an admin drove this update (adminId set) - a student
+    // updating their own profile via updateMe is not an admin action.
+    if (adminId) {
+      this.auditLog
+        .log({ id: adminId }, 'student.update', 'Student', student.id, `Updated student ${student.fullName} (${student.studentNumber})`)
+        .catch(() => undefined);
+    }
+
+    return student;
   }
 
-  async deactivate(id: string) {
+  async deactivate(id: string, adminId?: string) {
     await this.findOne(id);
-    return this.prisma.student.update({ where: { id }, data: { isActive: false }, select: STUDENT_SELECT });
+    const student = await this.prisma.student.update({ where: { id }, data: { isActive: false }, select: STUDENT_SELECT });
+
+    this.auditLog
+      .log(
+        adminId ? { id: adminId } : undefined,
+        'student.deactivate',
+        'Student',
+        student.id,
+        `Deactivated student ${student.fullName} (${student.studentNumber})`,
+      )
+      .catch(() => undefined);
+
+    return student;
   }
 
-  async activate(id: string) {
+  async activate(id: string, adminId?: string) {
     await this.findOne(id);
-    return this.prisma.student.update({ where: { id }, data: { isActive: true }, select: STUDENT_SELECT });
+    const student = await this.prisma.student.update({ where: { id }, data: { isActive: true }, select: STUDENT_SELECT });
+
+    this.auditLog
+      .log(
+        adminId ? { id: adminId } : undefined,
+        'student.activate',
+        'Student',
+        student.id,
+        `Activated student ${student.fullName} (${student.studentNumber})`,
+      )
+      .catch(() => undefined);
+
+    return student;
   }
 
   async addFavouriteRoute(studentId: string, routeId: string) {

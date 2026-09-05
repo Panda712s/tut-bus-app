@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Badge } from '@/components/Badge';
 import { useStudents } from '@/hooks/useStudents';
+import { downloadCsv } from '@/lib/csv';
+import { IconDownload } from '@/components/icons';
 
 export default function StudentsPage() {
   const { students, error, activate, deactivate } = useStudents();
@@ -14,6 +16,19 @@ export default function StudentsPage() {
 
   async function handleActivate(id: string) {
     await activate(id);
+  }
+
+  function handleExport() {
+    downloadCsv(
+      'students.csv',
+      filtered.map((s) => ({
+        'Student #': s.studentNumber,
+        Name: s.fullName,
+        Email: s.email,
+        Verified: s.emailVerified ? 'Yes' : 'No',
+        Status: s.isActive ? 'ACTIVE' : 'INACTIVE',
+      })),
+    );
   }
 
   const filtered = students.filter(
@@ -30,12 +45,22 @@ export default function StudentsPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-ink">Students</h1>
           <p className="text-sm text-ink-muted">Registered students (self-registered via the mobile app).</p>
         </div>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name, number or email"
-          className="w-72 rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-        />
+        <div className="flex items-center gap-3">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name, number or email"
+            className="w-72 rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          />
+          <button
+            onClick={handleExport}
+            disabled={filtered.length === 0}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-accent/[0.06] hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <IconDownload className="h-4 w-4" />
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {error && <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">{error}</p>}

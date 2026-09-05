@@ -1,19 +1,29 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { BusCapacityState } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditLogService } from '../audit/audit-log.service';
 import { CreateBusDto } from './dto/create-bus.dto';
 import { UpdateBusDto } from './dto/update-bus.dto';
 
 @Injectable()
 export class BusesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditLog: AuditLogService,
+  ) {}
 
-  async create(dto: CreateBusDto) {
+  async create(dto: CreateBusDto, adminId?: string) {
     const existing = await this.prisma.bus.findFirst({
       where: { OR: [{ busNumber: dto.busNumber }, { plateNumber: dto.plateNumber }] },
     });
     if (existing) throw new ConflictException('A bus with this number or plate already exists');
-    return this.prisma.bus.create({ data: dto });
+    const bus = await this.prisma.bus.create({ data: dto });
+
+    this.auditLog
+      .log(adminId ? { id: adminId } : undefined, 'bus.create', 'Bus', bus.id, `Created bus ${bus.busNumber} (${bus.plateNumber})`)
+      .catch(() => undefined);
+
+    return bus;
   }
 
   async findAll() {
@@ -37,9 +47,15 @@ export class BusesService {
     return this.prisma.bus.update({ where: { id }, data: dto });
   }
 
-  async remove(id: string) {
+  async remove(id: string, adminId?: string) {
     await this.findOne(id);
-    return this.prisma.bus.update({ where: { id }, data: { status: 'INACTIVE' } });
+    const bus = await this.prisma.bus.update({ where: { id }, data: { status: 'INACTIVE' } });
+
+    this.auditLog
+      .log(adminId ? { id: adminId } : undefined, 'bus.decommission', 'Bus', bus.id, `Decommissioned bus ${bus.busNumber} (${bus.plateNumber})`)
+      .catch(() => undefined);
+
+    return bus;
   }
 
   /** All buses currently assigned to a route, with their live GPS snapshot - powers the live map. */

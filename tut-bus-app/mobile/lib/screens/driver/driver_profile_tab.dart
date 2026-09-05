@@ -8,6 +8,7 @@ import '../../widgets/person_avatar.dart';
 import '../../widgets/state_views.dart';
 import '../../widgets/tut_background.dart';
 import '../settings/settings_screen.dart';
+import 'driver_change_password_screen.dart';
 import 'driver_edit_profile_screen.dart';
 import 'driver_incident_screen.dart';
 
@@ -100,6 +101,12 @@ class _DriverProfileTabState extends State<DriverProfileTab> {
                           );
                           _load();
                         },
+                      ),
+                      _NavRow(
+                        icon: Icons.password_rounded,
+                        label: 'Change password',
+                        onTap: () => Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (_) => const DriverChangePasswordScreen())),
                       ),
                       _NavRow(
                         icon: Icons.report_problem_outlined,

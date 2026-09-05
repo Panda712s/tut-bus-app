@@ -204,6 +204,19 @@ export interface TripRatingItem {
   trip?: { id: string; route: { name: string } } | null;
 }
 
+// ----- Admin activity log -----
+
+export interface AuditLogItem {
+  id: string;
+  action: string;
+  targetType: string;
+  targetId: string | null;
+  summary: string;
+  createdAt: string;
+  adminId: string | null;
+  admin?: { id: string; fullName: string; email: string } | null;
+}
+
 // ----- ETA -----
 
 export interface RouteEtaBus {

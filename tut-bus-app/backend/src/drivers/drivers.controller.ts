@@ -7,6 +7,7 @@ import { DriversService } from './drivers.service';
 import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
 import { ReportIncidentDto } from './dto/report-incident.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('drivers')
 export class DriversController {
@@ -15,8 +16,8 @@ export class DriversController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  create(@Body() dto: CreateDriverDto) {
-    return this.drivers.create(dto);
+  create(@Body() dto: CreateDriverDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.drivers.create(dto, user.id);
   }
 
   @Get()
@@ -38,6 +39,13 @@ export class DriversController {
   @Roles(Role.DRIVER)
   updateMe(@CurrentUser() user: AuthenticatedUser, @Body() dto: UpdateDriverDto) {
     return this.drivers.update(user.id, dto);
+  }
+
+  @Patch('me/password')
+  @UseGuards(RolesGuard)
+  @Roles(Role.DRIVER)
+  changeMyPassword(@CurrentUser() user: AuthenticatedUser, @Body() dto: ChangePasswordDto) {
+    return this.drivers.changeOwnPassword(user.id, dto);
   }
 
   @Post('me/incidents')
@@ -64,28 +72,28 @@ export class DriversController {
   @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  update(@Param('id') id: string, @Body() dto: UpdateDriverDto) {
-    return this.drivers.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateDriverDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.drivers.update(id, dto, user.id);
   }
 
   @Patch(':id/deactivate')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  deactivate(@Param('id') id: string) {
-    return this.drivers.deactivate(id);
+  deactivate(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.drivers.deactivate(id, user.id);
   }
 
   @Patch(':id/activate')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  activate(@Param('id') id: string) {
-    return this.drivers.activate(id);
+  activate(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.drivers.activate(id, user.id);
   }
 
   @Patch(':id/reset-password')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  resetPassword(@Param('id') id: string) {
-    return this.drivers.resetPassword(id);
+  resetPassword(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.drivers.resetPassword(id, user.id);
   }
 }
