@@ -74,7 +74,7 @@ export default function SchedulesPage() {
       </div>
 
       {error && (
-        <p className="mb-4 flex items-center justify-between rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mb-4 flex items-center justify-between rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">
           {error}
           <button onClick={() => setError(null)} className="ml-3 text-xs underline">
             dismiss
@@ -111,7 +111,7 @@ export default function SchedulesPage() {
                         <button
                           onClick={() => handleRemoveTime(s.id)}
                           aria-label="Remove departure"
-                          className="flex h-7 w-7 items-center justify-center rounded-lg text-ink-dim transition-colors hover:bg-red-50 hover:text-red-600"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-ink-dim transition-colors hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
                         >
                           ✕
                         </button>

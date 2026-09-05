@@ -53,7 +53,7 @@ export default function BusesPage() {
         </button>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">{error}</p>}
 
       <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
         <table className="min-w-full divide-y divide-line text-sm">
@@ -87,11 +87,11 @@ export default function BusesPage() {
                 <td className="px-4 py-3"><Badge value={b.capacityState} /></td>
                 <td className="px-4 py-3 text-right">
                   {b.status === 'INACTIVE' ? (
-                    <button onClick={() => handleRecommission(b.id)} className="text-xs font-medium text-emerald-700 hover:underline">
+                    <button onClick={() => handleRecommission(b.id)} className="text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:underline">
                       Recommission
                     </button>
                   ) : (
-                    <button onClick={() => handleDecommission(b.id)} className="text-xs font-medium text-red-700 hover:underline">
+                    <button onClick={() => handleDecommission(b.id)} className="text-xs font-medium text-red-700 dark:text-red-400 hover:underline">
                       Decommission
                     </button>
                   )}

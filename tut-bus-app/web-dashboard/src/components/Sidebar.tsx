@@ -105,7 +105,7 @@ export function Sidebar() {
             onClick={handleLogout}
             title="Sign out"
             aria-label="Sign out"
-            className="shrink-0 rounded-lg p-2 text-ink-dim transition-colors hover:bg-red-50 hover:text-red-600"
+            className="shrink-0 rounded-lg p-2 text-ink-dim transition-colors hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
           >
             <IconLogout className="h-[18px] w-[18px]" />
           </button>

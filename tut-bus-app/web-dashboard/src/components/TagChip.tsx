@@ -5,7 +5,7 @@ export function TagChip({ tag }: { tag: string }) {
   return (
     <span
       className={`inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
-        negative ? 'bg-red-50 text-red-700 ring-red-600/20' : 'bg-surface-raised text-ink-muted ring-ink/10'
+        negative ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20 dark:ring-red-400/25' : 'bg-surface-raised text-ink-muted ring-ink/10'
       }`}
     >
       {tag.replace(/_/g, ' ').toLowerCase()}

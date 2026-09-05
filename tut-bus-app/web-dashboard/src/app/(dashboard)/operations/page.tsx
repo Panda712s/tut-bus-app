@@ -25,15 +25,15 @@ export default function OperationsPage() {
         />
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">{error}</p>}
 
       {/* SOS — most urgent, always on top */}
       {sos.length > 0 && (
-        <div className="mb-6 overflow-hidden rounded-2xl border border-red-200 bg-red-50 shadow-card">
-          <div className="border-b border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 shadow-card">
+          <div className="border-b border-red-200 dark:border-red-500/30 px-4 py-2.5 text-sm font-semibold text-red-700 dark:text-red-400">
             🆘 {sos.length} active SOS alert{sos.length > 1 ? 's' : ''}
           </div>
-          <ul className="divide-y divide-red-100">
+          <ul className="divide-y divide-red-100 dark:divide-red-500/20">
             {sos.map((a) => (
               <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                 <div>
@@ -64,7 +64,7 @@ export default function OperationsPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => ackSos(a.id)}
-                    className="rounded-lg border border-red-300 bg-surface px-3 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100"
+                    className="rounded-lg border border-red-300 dark:border-red-500/40 bg-surface px-3 py-1.5 text-xs font-semibold text-red-700 dark:text-red-400 transition-colors hover:bg-red-100 dark:hover:bg-red-500/20"
                   >
                     Acknowledge
                   </button>
@@ -91,8 +91,8 @@ export default function OperationsPage() {
 
       {/* Off-route alerts */}
       {deviations.length > 0 && (
-        <div className="mb-6 overflow-hidden rounded-2xl border border-amber-200 bg-surface shadow-card">
-          <div className="flex items-center gap-1.5 border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-surface shadow-card">
+          <div className="flex items-center gap-1.5 border-b border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-4 py-2.5 text-sm font-semibold text-amber-700 dark:text-amber-400">
             <IconWarning className="h-4 w-4 shrink-0" />
             {deviations.length} bus{deviations.length > 1 ? 'es' : ''} off route
           </div>
@@ -136,7 +136,7 @@ export default function OperationsPage() {
           </thead>
           <tbody className="divide-y divide-line/60">
             {(fleet?.buses ?? []).map((b) => (
-              <tr key={b.tripId} className={b.offRoute ? 'bg-amber-50' : undefined}>
+              <tr key={b.tripId} className={b.offRoute ? 'bg-amber-50 dark:bg-amber-500/10' : undefined}>
                 <td className="px-4 py-3 font-medium text-ink">{b.bus.busNumber}</td>
                 <td className="px-4 py-3 text-ink-muted">{b.route.name}</td>
                 <td className="px-4 py-3 text-ink-muted">{b.driver.fullName}</td>
@@ -151,7 +151,7 @@ export default function OperationsPage() {
                 </td>
                 <td className="px-4 py-3">
                   {b.gpsStale ? (
-                    <span className="text-xs font-medium text-red-700">
+                    <span className="text-xs font-medium text-red-700 dark:text-red-400">
                       stale{b.fixAgeSeconds != null ? ` · ${b.fixAgeSeconds}s` : ''}
                     </span>
                   ) : (
@@ -160,7 +160,7 @@ export default function OperationsPage() {
                 </td>
                 <td className="px-4 py-3">
                   {b.offRoute ? (
-                    <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                    <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400 ring-1 ring-inset ring-amber-600/20 dark:ring-amber-400/25">
                       off route · {metresLabel(b.offRoute.distanceMeters)}
                     </span>
                   ) : (

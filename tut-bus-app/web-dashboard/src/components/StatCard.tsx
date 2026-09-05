@@ -3,10 +3,10 @@ import clsx from 'clsx';
 
 const TONES = {
   accent: 'bg-accent/10 text-accent',
-  gold: 'bg-gold/15 text-amber-700',
-  emerald: 'bg-emerald-50 text-emerald-600',
-  sky: 'bg-sky-50 text-sky-600',
-  violet: 'bg-violet-50 text-violet-600',
+  gold: 'bg-gold/15 text-amber-700 dark:text-amber-400',
+  emerald: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  sky: 'bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400',
+  violet: 'bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400',
 } as const;
 
 export function StatCard({

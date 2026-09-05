@@ -29,6 +29,36 @@
     --gold: 250 180 22; /* #FAB416 */
   }
 
+  /* Night mode — same token names, dark-tuned values. Applied via a `dark`
+     class on <html> (see ThemeToggle/theme.ts), not prefers-color-scheme,
+     so the admin's choice is explicit and persisted rather than inherited
+     from the OS. */
+  :root.dark {
+    color-scheme: dark;
+
+    /* Surfaces — deep navy, with cards a step lighter so they lift off the page */
+    --canvas: 8 12 22; /* #080C16 */
+    --surface: 19 27 44; /* #131B2C */
+    --surface-raised: 26 36 58; /* #1A243A */
+    --surface-inset: 11 16 28; /* #0B101C */
+
+    /* Lines */
+    --line: 33 44 66; /* #212C42 */
+    --line-soft: 226 232 240;
+
+    /* Text — soft white down to muted slate */
+    --ink: 226 232 240; /* #E2E8F0 */
+    --ink-muted: 148 163 184; /* #94A3B8 */
+    --ink-dim: 100 116 139; /* #64748B */
+
+    /* Accent — brightened a step so it still reads clearly against dark surfaces */
+    --accent: 56 145 214; /* #3891D6 */
+    --accent-strong: 10 87 150; /* #0A5796 */
+    --accent-soft: 56 145 214;
+    --accent-ink: 255 255 255;
+    --gold: 250 180 22; /* #FAB416 */
+  }
+
   html,
   body {
     height: 100%;

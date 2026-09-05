@@ -129,7 +129,7 @@ export default function DriversPage() {
           <p className="text-sm text-ink-muted">
             Onboard and manage bus drivers.{' '}
             {buses.length > 0 && (
-              <span className={unassignedBusCount > 0 ? 'font-medium text-amber-700' : 'font-medium text-emerald-700'}>
+              <span className={unassignedBusCount > 0 ? 'font-medium text-amber-700 dark:text-amber-400' : 'font-medium text-emerald-700 dark:text-emerald-400'}>
                 {unassignedBusCount > 0
                   ? `${unassignedBusCount} bus${unassignedBusCount === 1 ? '' : 'es'} still need${unassignedBusCount === 1 ? 's' : ''} a driver.`
                   : 'Every bus has a driver.'}
@@ -142,7 +142,7 @@ export default function DriversPage() {
         </button>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">{error}</p>}
 
       <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
         <table className="min-w-full divide-y divide-line text-sm">
@@ -183,11 +183,11 @@ export default function DriversPage() {
                       Edit
                     </button>
                     {d.isActive ? (
-                      <button onClick={() => handleDeactivate(d.id)} className="text-xs font-medium text-red-700 hover:underline">
+                      <button onClick={() => handleDeactivate(d.id)} className="text-xs font-medium text-red-700 dark:text-red-400 hover:underline">
                         Deactivate
                       </button>
                     ) : (
-                      <button onClick={() => handleActivate(d.id)} className="text-xs font-medium text-emerald-700 hover:underline">
+                      <button onClick={() => handleActivate(d.id)} className="text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:underline">
                         Activate
                       </button>
                     )}
@@ -251,7 +251,7 @@ export default function DriversPage() {
       <Modal open={!!editing} onClose={() => setEditing(null)} title={editing ? `Edit ${editing.fullName}` : 'Edit driver'}>
         {editing && (
           <form onSubmit={handleSaveEdit}>
-            {editError && <p className="mb-3.5 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{editError}</p>}
+            {editError && <p className="mb-3.5 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">{editError}</p>}
             <Field label="Full name">
               <Input required value={editForm.fullName} onChange={(e) => setEditForm({ ...editForm, fullName: e.target.value })} />
             </Field>

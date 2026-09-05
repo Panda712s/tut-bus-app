@@ -14,7 +14,7 @@ export default function OverviewPage() {
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-ink">Overview</h1>
       <p className="mb-6 text-sm text-ink-muted">A snapshot of the TUT Bus App system right now.</p>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">{error}</p>}
 
       <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         <StatCard
