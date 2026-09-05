@@ -1,69 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { api } from '@/lib/api';
-import { getNotificationsSocket } from '@/lib/socket';
 import { Badge } from '@/components/Badge';
+import { Kpi } from '@/components/Kpi';
 import { relativeTime, metresLabel } from '@/lib/format';
-import type { FleetSnapshot, DeviationAlert, SosAlert } from '@/lib/types';
-
-const POLL_MS = 10_000;
+import { useOperations } from '@/hooks/useOperations';
 
 export default function OperationsPage() {
-  const [fleet, setFleet] = useState<FleetSnapshot | null>(null);
-  const [deviations, setDeviations] = useState<DeviationAlert[]>([]);
-  const [sos, setSos] = useState<SosAlert[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [pulse, setPulse] = useState(false);
-  const timer = useRef<ReturnType<typeof setInterval>>();
-
-  const load = useCallback(async () => {
-    try {
-      const [f, d, s] = await Promise.all([
-        api.get<FleetSnapshot>('/ops/fleet'),
-        api.get<DeviationAlert[]>('/ops/deviations?status=OPEN'),
-        api.get<SosAlert[]>('/safety/sos?status=ACTIVE'),
-      ]);
-      setFleet(f);
-      setDeviations(d);
-      setSos(s);
-      setError(null);
-      setPulse((p) => !p);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load operations data');
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-    timer.current = setInterval(load, POLL_MS);
-    const sock = getNotificationsSocket();
-    const bump = () => load();
-    sock.on('sos:new', bump);
-    sock.on('sos:updated', bump);
-    sock.on('ops:deviation', bump);
-    sock.on('ops:deviation-cleared', bump);
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-      sock.off('sos:new', bump);
-      sock.off('sos:updated', bump);
-      sock.off('ops:deviation', bump);
-      sock.off('ops:deviation-cleared', bump);
-    };
-  }, [load]);
-
-  async function ackSos(id: string) {
-    await api.patch(`/safety/sos/${id}/acknowledge`);
-    load();
-  }
-  async function resolveSos(id: string) {
-    await api.patch(`/safety/sos/${id}/resolve`);
-    load();
-  }
-  async function clearDeviation(id: string) {
-    await api.patch(`/ops/deviations/${id}/clear`);
-    load();
-  }
+  const { fleet, deviations, sos, error, pulse, ackSos, resolveSos, clearDeviation } = useOperations();
 
   return (
     <div>
@@ -234,29 +177,6 @@ export default function OperationsPage() {
           </tbody>
         </table>
       </div>
-    </div>
-  );
-}
-
-function Kpi({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string | number;
-  tone?: 'warn' | 'alert';
-}) {
-  const toneClass =
-    tone === 'alert'
-      ? 'border-red-200 bg-red-50 text-red-700'
-      : tone === 'warn'
-        ? 'border-amber-200 bg-amber-50 text-amber-700'
-        : 'border-line bg-surface text-ink';
-  return (
-    <div className={`rounded-xl border p-4 shadow-card ${toneClass}`}>
-      <p className="text-xs font-medium uppercase tracking-wide opacity-70">{label}</p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
     </div>
   );
 }

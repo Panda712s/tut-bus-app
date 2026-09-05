@@ -1,37 +1,26 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
-import { api, ApiError } from '@/lib/api';
+import { FormEvent, useState } from 'react';
+import { ApiError } from '@/lib/api';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
 import { Field, Input, Select } from '@/components/Field';
-import type { Bus, Driver, Route } from '@/lib/types';
+import { useBuses } from '@/hooks/useBuses';
 
 export default function BusesPage() {
-  const [buses, setBuses] = useState<Bus[]>([]);
-  const [routes, setRoutes] = useState<Route[]>([]);
-  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const { buses, routes, drivers, error, setError, create, decommission, recommission } = useBuses();
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ busNumber: '', plateNumber: '', capacity: 60, currentRouteId: '' });
-
-  function load() {
-    api.get<Bus[]>('/buses').then(setBuses).catch((e) => setError(e.message));
-    api.get<Route[]>('/routes').then(setRoutes).catch(() => undefined);
-    api.get<Driver[]>('/drivers').then(setDrivers).catch(() => undefined);
-  }
 
   function driverFor(busId: string) {
     return drivers.find((d) => d.isActive && d.assignedBusId === busId) ?? null;
   }
 
-  useEffect(load, []);
-
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
     setError(null);
     try {
-      await api.post('/buses', {
+      await create({
         busNumber: form.busNumber,
         plateNumber: form.plateNumber,
         capacity: Number(form.capacity),
@@ -39,20 +28,17 @@ export default function BusesPage() {
       });
       setOpen(false);
       setForm({ busNumber: '', plateNumber: '', capacity: 60, currentRouteId: '' });
-      load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to create bus');
     }
   }
 
   async function handleDecommission(id: string) {
-    await api.patch(`/buses/${id}/decommission`);
-    load();
+    await decommission(id);
   }
 
   async function handleRecommission(id: string) {
-    await api.patch(`/buses/${id}`, { status: 'ACTIVE' });
-    load();
+    await recommission(id);
   }
 
   return (

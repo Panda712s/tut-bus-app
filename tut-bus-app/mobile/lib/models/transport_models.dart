@@ -98,6 +98,27 @@ class LiveBus {
         capacity: json['capacity'] as int? ?? 60,
         routeId: json['currentRouteId'] as String? ?? json['routeId'] as String?,
       );
+
+  /// Merges a freshly-decoded live-location update with the previously known
+  /// state for the same bus, keeping the previous seating capacity since the
+  /// GPS socket payload doesn't carry it.
+  static LiveBus mergeLocationUpdate(LiveBus incoming, LiveBus? previous) {
+    final previousCapacity = previous?.capacity;
+    return previousCapacity != null
+        ? LiveBus(
+            id: incoming.id,
+            busNumber: incoming.busNumber,
+            lat: incoming.lat,
+            lng: incoming.lng,
+            heading: incoming.heading,
+            speedKmh: incoming.speedKmh,
+            capacityState: incoming.capacityState,
+            passengerCount: incoming.passengerCount,
+            capacity: previousCapacity,
+            routeId: incoming.routeId,
+          )
+        : incoming;
+  }
 }
 
 class Schedule {

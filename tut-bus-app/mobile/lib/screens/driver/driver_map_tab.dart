@@ -6,6 +6,8 @@ import '../../services/driver_repository.dart';
 import '../../services/socket_service.dart';
 import '../../services/transport_repository.dart';
 import '../../widgets/animated_map_controller.dart';
+import '../../widgets/bus_pin.dart';
+import '../../widgets/map_hint.dart';
 
 // Default camera centred on the TUT Pretoria campus area.
 const _defaultCenter = LatLng(-25.7461, 28.1881);
@@ -64,21 +66,7 @@ class _DriverMapTabState extends State<DriverMapTab> with SingleTickerProviderSt
     _gpsSocket.onBusLocation((data) {
       final incoming = LiveBus.fromJson(data);
       if (!mounted) return;
-      final previousCapacity = _buses[incoming.id]?.capacity;
-      final merged = previousCapacity != null
-          ? LiveBus(
-              id: incoming.id,
-              busNumber: incoming.busNumber,
-              lat: incoming.lat,
-              lng: incoming.lng,
-              heading: incoming.heading,
-              speedKmh: incoming.speedKmh,
-              capacityState: incoming.capacityState,
-              passengerCount: incoming.passengerCount,
-              capacity: previousCapacity,
-              routeId: incoming.routeId,
-            )
-          : incoming;
+      final merged = LiveBus.mergeLocationUpdate(incoming, _buses[incoming.id]);
       setState(() => _buses[incoming.id] = merged);
       _maybeCenterOnMe();
     });
@@ -122,7 +110,7 @@ class _DriverMapTabState extends State<DriverMapTab> with SingleTickerProviderSt
           point: LatLng(b.lat!, b.lng!),
           width: b.id == _myBusId ? 56 : 44,
           height: b.id == _myBusId ? 56 : 44,
-          child: _BusPin(
+          child: BusPin(
             label: b.busNumber,
             colour: _colourFor(b.capacityState),
             isMine: b.id == _myBusId,
@@ -223,7 +211,7 @@ class _DriverMapTabState extends State<DriverMapTab> with SingleTickerProviderSt
               child: AnimatedOpacity(
                 duration: const Duration(milliseconds: 300),
                 opacity: _buses.isEmpty ? 1 : 0,
-                child: const IgnorePointer(child: _MapHint(text: 'No buses are on the road right now.')),
+                child: const IgnorePointer(child: MapHint(text: 'No buses are on the road right now.')),
               ),
             ),
           ),
@@ -244,49 +232,3 @@ class _DriverMapTabState extends State<DriverMapTab> with SingleTickerProviderSt
   }
 }
 
-class _BusPin extends StatelessWidget {
-  const _BusPin({required this.label, required this.colour, required this.isMine, required this.onTap});
-
-  final String label;
-  final Color colour;
-  final bool isMine;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: colour,
-          shape: BoxShape.circle,
-          border: Border.all(color: isMine ? const Color(0xFFFAB416) : Colors.white, width: isMine ? 3.5 : 2.5),
-          boxShadow: [
-            BoxShadow(color: const Color(0x55000000), blurRadius: isMine ? 10 : 6, offset: const Offset(0, 2)),
-          ],
-        ),
-        child: Icon(Icons.directions_bus_filled_rounded, color: Colors.white, size: isMine ? 26 : 20),
-      ),
-    );
-  }
-}
-
-class _MapHint extends StatelessWidget {
-  const _MapHint({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Theme.of(context).dividerColor),
-        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 12, offset: Offset(0, 4))],
-      ),
-      child: Text(text, style: const TextStyle(fontSize: 13, color: Color(0xFF8A90A2))),
-    );
-  }
-}

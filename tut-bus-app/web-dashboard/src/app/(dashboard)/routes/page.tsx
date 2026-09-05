@@ -1,30 +1,24 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
-import { api, ApiError } from '@/lib/api';
+import { FormEvent, useState } from 'react';
+import { ApiError } from '@/lib/api';
 import { Modal } from '@/components/Modal';
 import { Field, Input } from '@/components/Field';
+import { useRoutes } from '@/hooks/useRoutes';
 import type { Route } from '@/lib/types';
 
 export default function RoutesPage() {
-  const [routes, setRoutes] = useState<Route[]>([]);
+  const { routes, error, setError, create, deactivate, addStop } = useRoutes();
   const [open, setOpen] = useState(false);
   const [stopModalRoute, setStopModalRoute] = useState<Route | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', origin: '', destination: '', distanceKm: '', estimatedDurationMin: '' });
   const [stopForm, setStopForm] = useState({ name: '', lat: '', lng: '', order: '' });
-
-  function load() {
-    api.get<Route[]>('/routes').then(setRoutes).catch((e) => setError(e.message));
-  }
-
-  useEffect(load, []);
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
     setError(null);
     try {
-      await api.post('/routes', {
+      await create({
         name: form.name,
         origin: form.origin,
         destination: form.destination,
@@ -33,15 +27,13 @@ export default function RoutesPage() {
       });
       setOpen(false);
       setForm({ name: '', origin: '', destination: '', distanceKm: '', estimatedDurationMin: '' });
-      load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to create route');
     }
   }
 
   async function handleDeactivate(id: string) {
-    await api.patch(`/routes/${id}/deactivate`);
-    load();
+    await deactivate(id);
   }
 
   async function handleAddStop(e: FormEvent) {
@@ -49,7 +41,7 @@ export default function RoutesPage() {
     if (!stopModalRoute) return;
     setError(null);
     try {
-      await api.post('/stops', {
+      const refreshed = await addStop({
         routeId: stopModalRoute.id,
         name: stopForm.name,
         lat: Number(stopForm.lat),
@@ -57,9 +49,7 @@ export default function RoutesPage() {
         order: stopForm.order ? Number(stopForm.order) : undefined,
       });
       setStopForm({ name: '', lat: '', lng: '', order: '' });
-      const refreshed = await api.get<Route>(`/routes/${stopModalRoute.id}`);
       setStopModalRoute(refreshed);
-      load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to add stop');
     }

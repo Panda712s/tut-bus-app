@@ -3,6 +3,10 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 
+const ADMIN_SELECT = {
+  id: true, fullName: true, email: true, role: true, isActive: true, createdAt: true,
+};
+
 @Injectable()
 export class AdminsService {
   constructor(private prisma: PrismaService) {}
@@ -18,20 +22,16 @@ export class AdminsService {
     const hashed = await bcrypt.hash(dto.password, 10);
     return this.prisma.admin.create({
       data: { fullName: dto.fullName, email: dto.email, password: hashed, role: dto.role },
+      select: ADMIN_SELECT,
     });
   }
 
   async findAll() {
-    return this.prisma.admin.findMany({
-      select: { id: true, fullName: true, email: true, role: true, isActive: true, createdAt: true },
-    });
+    return this.prisma.admin.findMany({ select: ADMIN_SELECT });
   }
 
   async findOne(id: string) {
-    const admin = await this.prisma.admin.findUnique({
-      where: { id },
-      select: { id: true, fullName: true, email: true, role: true, isActive: true, createdAt: true },
-    });
+    const admin = await this.prisma.admin.findUnique({ where: { id }, select: ADMIN_SELECT });
     if (!admin) throw new NotFoundException('Admin not found');
     return admin;
   }

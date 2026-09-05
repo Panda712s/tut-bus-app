@@ -1,35 +1,24 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
-import { api, ApiError } from '@/lib/api';
+import { FormEvent, useState } from 'react';
+import { ApiError } from '@/lib/api';
 import { Field, Input, Select } from '@/components/Field';
-import type { NotificationItem, Route } from '@/lib/types';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const TYPES = ['GENERAL', 'BUS_ARRIVAL', 'BUS_DEPARTURE', 'DELAY_ALERT', 'ROUTE_CHANGE', 'WEATHER_ALERT', 'EMERGENCY'];
 const AUDIENCES = ['ALL_STUDENTS', 'ROUTE_STUDENTS', 'ALL_DRIVERS'];
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [routes, setRoutes] = useState<Route[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const { notifications, routes, error, setError, send } = useNotifications();
   const [success, setSuccess] = useState<string | null>(null);
   const [form, setForm] = useState({ title: '', body: '', type: 'GENERAL', audience: 'ALL_STUDENTS', routeId: '' });
-
-  function load() {
-    api.get<NotificationItem[]>('/notifications').then(setNotifications).catch((e) => setError(e.message));
-  }
-
-  useEffect(() => {
-    load();
-    api.get<Route[]>('/routes').then(setRoutes);
-  }, []);
 
   async function handleSend(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setSuccess(null);
     try {
-      await api.post('/notifications', {
+      await send({
         title: form.title,
         body: form.body,
         type: form.type,
@@ -38,7 +27,6 @@ export default function NotificationsPage() {
       });
       setSuccess('Notification sent.');
       setForm({ title: '', body: '', type: 'GENERAL', audience: 'ALL_STUDENTS', routeId: '' });
-      load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to send notification');
     }

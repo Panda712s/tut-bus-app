@@ -3,12 +3,16 @@ import { RatingDirection, TripStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from '../common/decorators/current-user.decorator';
 import { haversineMeters } from '../common/geo/geo.util';
+import { DriversService } from '../drivers/drivers.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { allowedTagsFor } from './rating-tags';
 
 @Injectable()
 export class RatingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private drivers: DriversService,
+  ) {}
 
   async submit(user: AuthenticatedUser, dto: CreateRatingDto) {
     const trip = await this.prisma.trip.findUnique({ where: { id: dto.tripId } });
@@ -102,8 +106,7 @@ export class RatingsService {
 
   /** Rating & tag breakdown for a driver - powers the driver stats screen. */
   async driverSummary(driverId: string) {
-    const driver = await this.prisma.driver.findUnique({ where: { id: driverId } });
-    if (!driver) throw new NotFoundException('Driver not found');
+    const driver = await this.drivers.findOne(driverId);
 
     const [tripsCompleted, ratings] = await Promise.all([
       this.prisma.trip.count({ where: { driverId, status: TripStatus.COMPLETED } }),

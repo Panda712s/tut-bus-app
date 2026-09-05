@@ -4,6 +4,8 @@ import 'package:latlong2/latlong.dart';
 import '../../models/transport_models.dart';
 import '../../services/socket_service.dart';
 import '../../services/transport_repository.dart';
+import '../../widgets/bus_pin.dart';
+import '../../widgets/map_hint.dart';
 
 // Default camera centred on the TUT Pretoria campus area.
 const _defaultCenter = LatLng(-25.7461, 28.1881);
@@ -48,23 +50,7 @@ class _LiveMapTabState extends State<LiveMapTab> {
     _gpsSocket.onBusLocation((data) {
       final incoming = LiveBus.fromJson(data);
       if (!mounted) return;
-      // The socket payload doesn't carry the bus's seating capacity, so keep
-      // whatever the initial REST fetch already told us.
-      final previousCapacity = _buses[incoming.id]?.capacity;
-      final merged = previousCapacity != null
-          ? LiveBus(
-              id: incoming.id,
-              busNumber: incoming.busNumber,
-              lat: incoming.lat,
-              lng: incoming.lng,
-              heading: incoming.heading,
-              speedKmh: incoming.speedKmh,
-              capacityState: incoming.capacityState,
-              passengerCount: incoming.passengerCount,
-              capacity: previousCapacity,
-              routeId: incoming.routeId,
-            )
-          : incoming;
+      final merged = LiveBus.mergeLocationUpdate(incoming, _buses[incoming.id]);
       setState(() => _buses[incoming.id] = merged);
     });
   }
@@ -89,7 +75,7 @@ class _LiveMapTabState extends State<LiveMapTab> {
           point: LatLng(b.lat!, b.lng!),
           width: 44,
           height: 44,
-          child: _BusPin(
+          child: BusPin(
             label: b.busNumber,
             colour: _colourFor(b.capacityState),
             onTap: () => _showBusSheet(b),
@@ -175,7 +161,7 @@ class _LiveMapTabState extends State<LiveMapTab> {
               left: 0,
               right: 0,
               bottom: 24,
-              child: Center(child: _MapHint(text: 'No buses are on the road right now.')),
+              child: Center(child: MapHint(text: 'No buses are on the road right now.')),
             ),
         ],
       ),
@@ -183,46 +169,3 @@ class _LiveMapTabState extends State<LiveMapTab> {
   }
 }
 
-class _BusPin extends StatelessWidget {
-  const _BusPin({required this.label, required this.colour, required this.onTap});
-
-  final String label;
-  final Color colour;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: colour,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2.5),
-          boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 6, offset: Offset(0, 2))],
-        ),
-        child: const Icon(Icons.directions_bus_filled_rounded, color: Colors.white, size: 20),
-      ),
-    );
-  }
-}
-
-class _MapHint extends StatelessWidget {
-  const _MapHint({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Theme.of(context).dividerColor),
-        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 12, offset: Offset(0, 4))],
-      ),
-      child: Text(text, style: const TextStyle(fontSize: 13, color: Color(0xFF8A90A2))),
-    );
-  }
-}

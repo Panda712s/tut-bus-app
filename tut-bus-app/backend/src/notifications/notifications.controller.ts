@@ -26,8 +26,7 @@ export class NotificationsController {
 
   @Get('me')
   findMine(@CurrentUser() user: AuthenticatedUser) {
-    if (user.role === Role.DRIVER) return this.notifications.findForDriver(user.id);
-    return this.notifications.findForStudent(user.id);
+    return this.notifications.findForUser(user);
   }
 
   @Patch(':recipientId/read')

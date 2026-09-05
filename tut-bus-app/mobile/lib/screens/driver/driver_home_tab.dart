@@ -3,13 +3,15 @@ import '../../models/transport_models.dart';
 import '../../models/user_models.dart';
 import '../../services/driver_repository.dart';
 import '../../services/transport_repository.dart';
-import '../../widgets/primary_button.dart';
+import '../../widgets/active_trip_card.dart';
+import '../../widgets/empty_bus_card.dart';
+import '../../widgets/start_trip_card.dart';
 import '../../widgets/state_views.dart';
+import '../../widgets/status_pill.dart';
 import '../../widgets/tut_background.dart';
 import '../../widgets/weather_card.dart';
 import 'driver_trip_screen.dart';
 
-const _accent = Color(0xFF0A5796);
 const _muted = Color(0xFF8A90A2);
 
 class DriverHomeTab extends StatefulWidget {
@@ -121,7 +123,7 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                                   ],
                                 ),
                               ),
-                              _StatusPill(status: _profile?.status ?? '—'),
+                              StatusPill(status: _profile?.status ?? '—'),
                             ],
                           ),
                           const SizedBox(height: 20),
@@ -134,9 +136,9 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                               child: SizeTransition(sizeFactor: anim, child: child),
                             ),
                             child: _profile?.assignedBusId == null
-                                ? const _EmptyBusCard(key: ValueKey('no-bus'))
+                                ? const EmptyBusCard(key: ValueKey('no-bus'))
                                 : _activeTrip != null
-                                    ? _ActiveTripCard(
+                                    ? ActiveTripCard(
                                         key: const ValueKey('active-trip'),
                                         status: _activeTrip!['status'] as String,
                                         onResume: () async {
@@ -149,7 +151,7 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                                           _load();
                                         },
                                       )
-                                    : _StartTripCard(
+                                    : StartTripCard(
                                         key: const ValueKey('start-trip'),
                                         routes: _routes,
                                         selectedRouteId: _selectedRouteId,
@@ -167,165 +169,3 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
   }
 }
 
-class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.status});
-  final String status;
-
-  @override
-  Widget build(BuildContext context) {
-    final isActive = status == 'ACTIVE' || status == 'ON_TRIP';
-    final color = isActive ? const Color(0xFF15803D) : _muted;
-    final bg = isActive ? const Color(0x1F16A34A) : const Color(0x140A5796);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(
-        status.replaceAll('_', ' '),
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color, letterSpacing: 0.2),
-      ),
-    );
-  }
-}
-
-class _EmptyBusCard extends StatelessWidget {
-  const _EmptyBusCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: Column(
-        children: [
-          Container(
-            height: 52,
-            width: 52,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: const Color(0x140A5796), borderRadius: BorderRadius.circular(16)),
-            child: const Icon(Icons.directions_bus_outlined, color: _accent, size: 26),
-          ),
-          const SizedBox(height: 14),
-          const Text('No bus assigned yet', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15.5)),
-          const SizedBox(height: 6),
-          const Text(
-            'Contact your transport administrator to get assigned to a bus before you can start a trip.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: _muted, fontSize: 13, height: 1.4),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ActiveTripCard extends StatelessWidget {
-  const _ActiveTripCard({super.key, required this.status, required this.onResume});
-  final String status;
-  final VoidCallback onResume;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF0A5796), Color(0xFF073E68)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [BoxShadow(color: Color(0x330A5796), blurRadius: 24, offset: Offset(0, 10))],
-        ),
-        child: Row(
-          children: [
-            Container(
-              height: 50,
-              width: 50,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(15)),
-              child: const Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: 26),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Trip in progress', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15.5)),
-                  const SizedBox(height: 3),
-                  Text('Status: ${status.replaceAll('_', ' ')}', style: TextStyle(color: Colors.white.withValues(alpha: 0.78), fontSize: 12.5)),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
-            FilledButton(
-              onPressed: onResume,
-              style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: _accent),
-              child: const Text('Resume'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StartTripCard extends StatelessWidget {
-  const _StartTripCard({
-    super.key,
-    required this.routes,
-    required this.selectedRouteId,
-    required this.onRouteChanged,
-    required this.starting,
-    required this.onStart,
-  });
-
-  final List<BusRoute> routes;
-  final String? selectedRouteId;
-  final ValueChanged<String?> onRouteChanged;
-  final bool starting;
-  final VoidCallback onStart;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                height: 34,
-                width: 34,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: const Color(0x140A5796), borderRadius: BorderRadius.circular(10)),
-                child: const Icon(Icons.route_rounded, size: 18, color: _accent),
-              ),
-              const SizedBox(width: 10),
-              const Text('Start a new trip', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15.5)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            initialValue: selectedRouteId,
-            decoration: const InputDecoration(labelText: 'Route'),
-            items: routes.map((r) => DropdownMenuItem(value: r.id, child: Text(r.name))).toList(),
-            onChanged: onRouteChanged,
-          ),
-          const SizedBox(height: 18),
-          PrimaryButton(label: 'Start trip', loading: starting, onPressed: onStart),
-        ],
-      ),
-    );
-  }
-}

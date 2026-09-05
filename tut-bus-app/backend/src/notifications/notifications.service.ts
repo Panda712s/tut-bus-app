@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Role } from '../common/enums/role.enum';
+import { AuthenticatedUser } from '../common/decorators/current-user.decorator';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { NotificationsGateway } from './notifications.gateway';
 import { FcmService } from './fcm.service';
@@ -74,6 +76,11 @@ export class NotificationsService {
       return { studentIds: favourites.map((f) => f.studentId), driverIds: [] };
     }
     return { studentIds: [], driverIds: [] };
+  }
+
+  findForUser(user: AuthenticatedUser) {
+    if (user.role === Role.DRIVER) return this.findForDriver(user.id);
+    return this.findForStudent(user.id);
   }
 
   async findForStudent(studentId: string) {

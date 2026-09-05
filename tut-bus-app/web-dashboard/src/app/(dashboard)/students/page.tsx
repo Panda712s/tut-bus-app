@@ -1,29 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { useState } from 'react';
 import { Badge } from '@/components/Badge';
-import type { Student } from '@/lib/types';
+import { useStudents } from '@/hooks/useStudents';
 
 export default function StudentsPage() {
-  const [students, setStudents] = useState<Student[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const { students, error, activate, deactivate } = useStudents();
   const [search, setSearch] = useState('');
 
-  function load() {
-    api.get<Student[]>('/students').then(setStudents).catch((e) => setError(e.message));
-  }
-
-  useEffect(load, []);
-
   async function handleDeactivate(id: string) {
-    await api.patch(`/students/${id}/deactivate`);
-    load();
+    await deactivate(id);
   }
 
   async function handleActivate(id: string) {
-    await api.patch(`/students/${id}/activate`);
-    load();
+    await activate(id);
   }
 
   const filtered = students.filter(

@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { Stars } from '@/components/Stars';
+import { TagChip } from '@/components/TagChip';
 import { relativeTime } from '@/lib/format';
-import type { FeedbackItem, TripRatingItem } from '@/lib/types';
+import { useFeedback } from '@/hooks/useFeedback';
 
 const CATEGORY_LABEL: Record<string, string> = {
   DRIVER_RATING: 'Driver rating',
@@ -11,37 +11,8 @@ const CATEGORY_LABEL: Record<string, string> = {
   SUGGESTION: 'Suggestion',
 };
 
-function Stars({ score }: { score: number }) {
-  return (
-    <span className="text-amber-500" aria-label={`${score} out of 5`}>
-      {'★'.repeat(score)}
-      <span className="text-ink-dim">{'★'.repeat(5 - score)}</span>
-    </span>
-  );
-}
-
-function TagChip({ tag }: { tag: string }) {
-  const negative = ['RECKLESS', 'LATE', 'OVERCROWDED', 'RUDE', 'SKIPPED_STOP', 'BEHIND_SCHEDULE', 'VEHICLE_ISSUE', 'PASSENGER_ISSUE'].includes(tag);
-  return (
-    <span
-      className={`inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
-        negative ? 'bg-red-50 text-red-700 ring-red-600/20' : 'bg-surface-raised text-ink-muted ring-ink/10'
-      }`}
-    >
-      {tag.replace(/_/g, ' ').toLowerCase()}
-    </span>
-  );
-}
-
 export default function FeedbackPage() {
-  const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
-  const [ratings, setRatings] = useState<TripRatingItem[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    api.get<FeedbackItem[]>('/feedback').then(setFeedback).catch((e) => setError(e.message));
-    api.get<TripRatingItem[]>('/ratings/recent').then(setRatings).catch(() => undefined);
-  }, []);
+  const { feedback, ratings, error } = useFeedback();
 
   return (
     <div>

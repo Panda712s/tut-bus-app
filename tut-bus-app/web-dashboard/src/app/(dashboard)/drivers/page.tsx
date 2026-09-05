@@ -1,10 +1,13 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { api, ApiError } from '@/lib/api';
+import { FormEvent, useMemo, useState } from 'react';
+import { ApiError } from '@/lib/api';
 import { Badge } from '@/components/Badge';
 import { Modal } from '@/components/Modal';
 import { Field, Input, Select } from '@/components/Field';
+import { DriverAvatar } from '@/components/DriverAvatar';
+import { CredentialsReveal } from '@/components/CredentialsReveal';
+import { useDrivers } from '@/hooks/useDrivers';
 import type { Bus, Driver } from '@/lib/types';
 
 const EMPTY_CREATE_FORM = {
@@ -24,11 +27,9 @@ interface RevealedCredentials {
 }
 
 export default function DriversPage() {
-  const [drivers, setDrivers] = useState<Driver[]>([]);
-  const [buses, setBuses] = useState<Bus[]>([]);
+  const { drivers, buses, error, setError, create, update, resetPassword, activate, deactivate } = useDrivers();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Driver | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_CREATE_FORM);
   const [editForm, setEditForm] = useState({ fullName: '', phone: '', status: 'ACTIVE', assignedBusId: '' });
@@ -37,13 +38,6 @@ export default function DriversPage() {
   // this holds the plaintext for the single response that just created or
   // reset one, so the admin can copy it down before the modal closes.
   const [revealed, setRevealed] = useState<RevealedCredentials | null>(null);
-
-  function load() {
-    api.get<Driver[]>('/drivers').then(setDrivers).catch((e) => setError(e.message));
-    api.get<Bus[]>('/buses').then(setBuses).catch(() => undefined);
-  }
-
-  useEffect(load, []);
 
   // Which bus each driver currently drives, and how many buses still have nobody assigned —
   // this is what tells the admin how many more drivers they still need to onboard.
@@ -63,7 +57,7 @@ export default function DriversPage() {
     e.preventDefault();
     setError(null);
     try {
-      const created = await api.post<Driver & { temporaryPassword: string }>('/drivers', {
+      const created = await create({
         ...form,
         password: form.password.trim() || undefined,
         assignedBusId: form.assignedBusId || undefined,
@@ -71,7 +65,6 @@ export default function DriversPage() {
       setOpen(false);
       setForm(EMPTY_CREATE_FORM);
       setRevealed({ heading: `${created.fullName} was created`, email: created.email, password: created.temporaryPassword });
-      load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to create driver');
     }
@@ -93,14 +86,13 @@ export default function DriversPage() {
     if (!editing) return;
     setEditError(null);
     try {
-      await api.patch(`/drivers/${editing.id}`, {
+      await update(editing.id, {
         fullName: editForm.fullName,
         phone: editForm.phone || undefined,
         status: editForm.status,
         assignedBusId: editForm.assignedBusId || null,
       });
       setEditing(null);
-      load();
     } catch (err) {
       setEditError(err instanceof ApiError ? err.message : 'Failed to update driver');
     }
@@ -111,7 +103,7 @@ export default function DriversPage() {
     setResettingPassword(true);
     setEditError(null);
     try {
-      const result = await api.patch<{ temporaryPassword: string }>(`/drivers/${editing.id}/reset-password`);
+      const result = await resetPassword(editing.id);
       setEditing(null);
       setRevealed({ heading: `New password for ${editing.fullName}`, email: editing.email, password: result.temporaryPassword });
     } catch (err) {
@@ -122,13 +114,11 @@ export default function DriversPage() {
   }
 
   async function handleDeactivate(id: string) {
-    await api.patch(`/drivers/${id}/deactivate`);
-    load();
+    await deactivate(id);
   }
 
   async function handleActivate(id: string) {
-    await api.patch(`/drivers/${id}/activate`);
-    load();
+    await activate(id);
   }
 
   return (
@@ -309,76 +299,6 @@ export default function DriversPage() {
       <Modal open={!!revealed} onClose={() => setRevealed(null)} title={revealed?.heading ?? 'Credentials'}>
         {revealed && <CredentialsReveal email={revealed.email} password={revealed.password} onDone={() => setRevealed(null)} />}
       </Modal>
-    </div>
-  );
-}
-
-function CredentialsReveal({ email, password, onDone }: { email: string; password: string; onDone: () => void }) {
-  const [copied, setCopied] = useState<'email' | 'password' | null>(null);
-
-  async function copy(value: string, which: 'email' | 'password') {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(which);
-      setTimeout(() => setCopied((c) => (c === which ? null : c)), 1500);
-    } catch {
-      // Clipboard permission denied - the value is still visible to select/copy manually.
-    }
-  }
-
-  return (
-    <div>
-      <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-700">
-        This is the only time this password will be shown. Copy it down or send it to the driver now - if it&apos;s lost later, use <span className="font-semibold">Reset password</span> from that driver&apos;s Edit screen.
-      </p>
-
-      <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-ink-dim">Sign-in email</label>
-      <div className="mb-3.5 flex items-center gap-2">
-        <code className="flex-1 truncate rounded-xl border border-line bg-surface-inset px-3.5 py-2.5 text-sm text-ink">{email}</code>
-        <button
-          type="button"
-          onClick={() => copy(email, 'email')}
-          className="shrink-0 rounded-xl border border-line px-3 py-2.5 text-xs font-semibold text-ink-muted transition-colors hover:bg-accent/[0.06] hover:text-ink"
-        >
-          {copied === 'email' ? 'Copied ✓' : 'Copy'}
-        </button>
-      </div>
-
-      <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-ink-dim">Temporary password</label>
-      <div className="mb-4 flex items-center gap-2">
-        <code className="flex-1 truncate rounded-xl border border-accent/30 bg-accent/[0.06] px-3.5 py-2.5 text-sm font-semibold tracking-wide text-ink">{password}</code>
-        <button
-          type="button"
-          onClick={() => copy(password, 'password')}
-          className="shrink-0 rounded-xl border border-line px-3 py-2.5 text-xs font-semibold text-ink-muted transition-colors hover:bg-accent/[0.06] hover:text-ink"
-        >
-          {copied === 'password' ? 'Copied ✓' : 'Copy'}
-        </button>
-      </div>
-
-      <button
-        type="button"
-        onClick={onDone}
-        className="w-full rounded-xl bg-accent-grad px-4 py-2.5 text-sm font-semibold text-white shadow-glow-sm transition-all duration-150 hover:shadow-glow hover:brightness-110 active:scale-[0.98]"
-      >
-        I&apos;ve saved this
-      </button>
-    </div>
-  );
-}
-
-/** Small round avatar for the drivers table - reflects whatever photo the
- * driver has set on their own profile in the mobile app, since it's the
- * same underlying record the admin is reading here. */
-function DriverAvatar({ name, imageUrl }: { name: string; imageUrl?: string | null }) {
-  if (imageUrl) {
-    // eslint-disable-next-line @next/next/no-img-element -- data: URIs, not a Next-optimizable remote image
-    return <img src={imageUrl} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />;
-  }
-  const initial = name.trim().charAt(0).toUpperCase() || '?';
-  return (
-    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-grad text-xs font-bold text-white">
-      {initial}
     </div>
   );
 }
