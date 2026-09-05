@@ -1,31 +1,53 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import clsx from 'clsx';
-import { clearTokens } from '@/lib/api';
+import { clearTokens, getStoredUser } from '@/lib/api';
+import type { AuthUser } from '@/lib/types';
+import {
+  IconOverview,
+  IconMap,
+  IconPulse,
+  IconBus,
+  IconIdCard,
+  IconRoute,
+  IconClock,
+  IconGraduationCap,
+  IconBell,
+  IconChat,
+  IconLogout,
+} from '@/components/icons';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Overview', icon: '📊' },
-  { href: '/live-map', label: 'Live Map', icon: '🗺️' },
-  { href: '/operations', label: 'Operations', icon: '🛰️' },
-  { href: '/buses', label: 'Buses', icon: '🚌' },
-  { href: '/drivers', label: 'Drivers', icon: '🪪' },
-  { href: '/routes', label: 'Routes & Stops', icon: '🛣️' },
-  { href: '/schedules', label: 'Schedules', icon: '🕒' },
-  { href: '/students', label: 'Students', icon: '🎓' },
-  { href: '/notifications', label: 'Notifications', icon: '🔔' },
-  { href: '/feedback', label: 'Feedback', icon: '💬' },
+  { href: '/', label: 'Overview', icon: IconOverview },
+  { href: '/live-map', label: 'Live Map', icon: IconMap },
+  { href: '/operations', label: 'Operations', icon: IconPulse },
+  { href: '/buses', label: 'Buses', icon: IconBus },
+  { href: '/drivers', label: 'Drivers', icon: IconIdCard },
+  { href: '/routes', label: 'Routes & Stops', icon: IconRoute },
+  { href: '/schedules', label: 'Schedules', icon: IconClock },
+  { href: '/students', label: 'Students', icon: IconGraduationCap },
+  { href: '/notifications', label: 'Notifications', icon: IconBell },
+  { href: '/feedback', label: 'Feedback', icon: IconChat },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    setUser(getStoredUser<AuthUser>());
+  }, []);
 
   function handleLogout() {
     clearTokens();
     router.push('/login');
   }
+
+  const initial = user?.email.trim().charAt(0).toUpperCase() || 'A';
 
   return (
     <aside className="glass flex h-screen w-64 shrink-0 flex-col border-r border-line/80">
@@ -42,6 +64,7 @@ export function Sidebar() {
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
         {NAV_ITEMS.map((item) => {
           const active = pathname === item.href;
+          const ItemIcon = item.icon;
           return (
             <Link
               key={item.href}
@@ -60,8 +83,8 @@ export function Sidebar() {
                   active ? 'opacity-100 shadow-[0_0_12px_0_rgb(var(--accent)/0.7)]' : 'opacity-0',
                 )}
               />
-              <span className="w-5 text-center text-base transition-transform duration-150 group-hover:scale-110">
-                {item.icon}
+              <span className="flex w-5 shrink-0 items-center justify-center transition-transform duration-150 group-hover:scale-110">
+                <ItemIcon className={clsx('h-[18px] w-[18px]', active ? 'text-accent' : 'text-ink-dim')} />
               </span>
               {item.label}
             </Link>
@@ -70,12 +93,23 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-line/70 p-3">
-        <button
-          onClick={handleLogout}
-          className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-ink-muted transition-colors hover:bg-accent/[0.06] hover:text-ink"
-        >
-          ↩ Sign out
-        </button>
+        <div className="flex items-center gap-2.5 rounded-xl px-2 py-2">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-grad text-sm font-semibold text-white shadow-glow-sm">
+            {initial}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-ink">Administrator</p>
+            <p className="truncate text-xs text-ink-dim">{user?.email ?? '—'}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            title="Sign out"
+            aria-label="Sign out"
+            className="shrink-0 rounded-lg p-2 text-ink-dim transition-colors hover:bg-red-50 hover:text-red-600"
+          >
+            <IconLogout className="h-[18px] w-[18px]" />
+          </button>
+        </div>
       </div>
     </aside>
   );

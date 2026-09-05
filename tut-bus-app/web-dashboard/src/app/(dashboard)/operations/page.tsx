@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/Badge';
 import { Kpi } from '@/components/Kpi';
+import { IconWarning } from '@/components/icons';
 import { relativeTime, metresLabel } from '@/lib/format';
 import { useOperations } from '@/hooks/useOperations';
 
@@ -91,8 +92,9 @@ export default function OperationsPage() {
       {/* Off-route alerts */}
       {deviations.length > 0 && (
         <div className="mb-6 overflow-hidden rounded-2xl border border-amber-200 bg-surface shadow-card">
-          <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700">
-            ⚠️ {deviations.length} bus{deviations.length > 1 ? 'es' : ''} off route
+          <div className="flex items-center gap-1.5 border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700">
+            <IconWarning className="h-4 w-4 shrink-0" />
+            {deviations.length} bus{deviations.length > 1 ? 'es' : ''} off route
           </div>
           <ul className="divide-y divide-line/60">
             {deviations.map((d) => (

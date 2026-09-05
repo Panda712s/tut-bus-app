@@ -4,6 +4,7 @@ import { StatCard } from '@/components/StatCard';
 import { TripsPerDayChart } from '@/components/TripsPerDayChart';
 import { BusiestRoutesCard } from '@/components/BusiestRoutesCard';
 import { useOverview } from '@/hooks/useOverview';
+import { IconGraduationCap, IconIdCard, IconBus, IconPulse, IconRoute, IconStar } from '@/components/icons';
 
 export default function OverviewPage() {
   const { overview, tripsPerDay, busiestRoutes, error } = useOverview();
@@ -16,15 +17,42 @@ export default function OverviewPage() {
       {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-        <StatCard label="Active students" value={overview?.studentCount ?? '—'} />
-        <StatCard label="Active drivers" value={overview?.driverCount ?? '—'} />
-        <StatCard label="Buses on the road" value={overview?.busCount ?? '—'} />
-        <StatCard label="Trips in progress" value={overview?.activeTripCount ?? '—'} />
-        <StatCard label="Active routes" value={overview?.routeCount ?? '—'} />
+        <StatCard
+          label="Active students"
+          value={overview?.studentCount ?? '—'}
+          icon={<IconGraduationCap className="h-4 w-4" />}
+          tone="sky"
+        />
+        <StatCard
+          label="Active drivers"
+          value={overview?.driverCount ?? '—'}
+          icon={<IconIdCard className="h-4 w-4" />}
+          tone="accent"
+        />
+        <StatCard
+          label="Buses on the road"
+          value={overview?.busCount ?? '—'}
+          icon={<IconBus className="h-4 w-4" />}
+          tone="emerald"
+        />
+        <StatCard
+          label="Trips in progress"
+          value={overview?.activeTripCount ?? '—'}
+          icon={<IconPulse className="h-4 w-4" />}
+          tone="gold"
+        />
+        <StatCard
+          label="Active routes"
+          value={overview?.routeCount ?? '—'}
+          icon={<IconRoute className="h-4 w-4" />}
+          tone="violet"
+        />
         <StatCard
           label="Avg. driver rating"
           value={overview?.averageDriverRating ? overview.averageDriverRating.toFixed(1) : '—'}
           hint={`${overview?.feedbackCount ?? 0} feedback entries`}
+          icon={<IconStar className="h-4 w-4" />}
+          tone="gold"
         />
       </div>
 

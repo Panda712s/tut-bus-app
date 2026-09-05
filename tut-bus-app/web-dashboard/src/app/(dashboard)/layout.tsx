@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
+import { TopBar } from '@/components/TopBar';
 import { useRequireAdmin } from '@/lib/auth';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -20,11 +21,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto bg-surface-inset p-8">
-        <div key={pathname} className="mx-auto max-w-7xl animate-fade-in">
-          {children}
-        </div>
-      </main>
+      <div className="flex flex-1 flex-col overflow-y-auto bg-surface-inset">
+        <TopBar />
+        <main className="flex-1 p-8">
+          <div key={pathname} className="mx-auto max-w-7xl animate-fade-in">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
