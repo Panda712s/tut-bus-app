@@ -31,6 +31,20 @@
 
   <title>tut_bus_app</title>
   <link rel="manifest" href="manifest.json">
+
+  <script>
+    // This build doesn't register a service worker (see --pwa-strategy=none in
+    // the build command), but a browser that visited an earlier build of this
+    // app during development may still have one active from before. An old
+    // service worker intercepts requests and can serve mismatched cached
+    // files against a newer build, which shows up as a broken/erroring app.
+    // Clean up any leftover registration before Flutter boots.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => registration.unregister());
+      });
+    }
+  </script>
 </head>
 <body>
   <!--
