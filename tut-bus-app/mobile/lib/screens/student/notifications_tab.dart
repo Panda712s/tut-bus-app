@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_l10n.dart';
 import '../../models/transport_models.dart';
 import '../../services/notifications_repository.dart';
 import '../../services/socket_service.dart';
@@ -39,7 +40,9 @@ class _NotificationsTabState extends State<NotificationsTab> {
       if (!mounted) return;
       setState(() => _notifications = items);
     } catch (e) {
-      if (mounted) setState(() => _error = 'Could not load notifications.\n$e');
+      if (mounted) {
+        setState(() => _error = '${AppL10n.of(context).t('notifications.loadError')}\n$e');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -109,15 +112,16 @@ class _NotificationsTabState extends State<NotificationsTab> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = AppL10n.of(context).t;
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifications')),
+      appBar: AppBar(title: Text(t('notifications.title'))),
       body: TutBackground(
         child: _loading
             ? const LoadingView()
             : _error != null
                 ? ErrorView(message: _error!, onRetry: _load)
                 : _notifications.isEmpty
-                    ? const EmptyView(message: 'No notifications yet.')
+                    ? EmptyView(message: t('notifications.empty'))
                     : RefreshIndicator(
                         onRefresh: _load,
                         child: ListView.separated(

@@ -18,4 +18,9 @@ class StudentRepository {
       if (profileImageUrl != null) 'profileImageUrl': profileImageUrl,
     });
   }
+
+  Future<Map<String, dynamic>> fetchMyStats() async {
+    final json = await _api.get('/students/me/stats');
+    return json as Map<String, dynamic>;
+  }
 }

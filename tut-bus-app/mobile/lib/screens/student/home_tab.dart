@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_l10n.dart';
 import '../../models/transport_models.dart';
 import '../../models/user_models.dart';
 import '../../services/student_repository.dart';
@@ -47,7 +48,7 @@ class _HomeTabState extends State<HomeTab> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Could not load your profile.\n$e';
+          _error = '${AppL10n.of(context).t('student.home.loadError')}\n$e';
           _loading = false;
         });
       }
@@ -66,6 +67,7 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppL10n.of(context).t;
     return Scaffold(
       appBar: AppBar(
         title: const Text('TUT Bus App'),
@@ -73,7 +75,7 @@ class _HomeTabState extends State<HomeTab> {
           IconButton(
             onPressed: _load,
             icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Refresh',
+            tooltip: t('common.refresh'),
           ),
         ],
       ),
@@ -88,26 +90,28 @@ class _HomeTabState extends State<HomeTab> {
                       padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
                       children: [
                         Text(
-                          'Hi, ${_profile?.fullName.split(' ').first ?? 'there'} 👋',
+                          AppL10n.of(context).tp('student.home.greeting', {
+                            'name': _profile?.fullName.split(' ').first ?? t('student.home.someone'),
+                          }),
                           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.4),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          "Here's what's happening on campus transport today.",
-                          style: TextStyle(color: Color(0xFF8A90A2), fontSize: 13.5),
+                        Text(
+                          t('student.home.subtitle'),
+                          style: const TextStyle(color: Color(0xFF8A90A2), fontSize: 13.5),
                         ),
                         const SizedBox(height: 20),
                         const WeatherCard(),
                         const SizedBox(height: 26),
                         _SectionHeader(
-                          title: 'Active buses nearby',
+                          title: t('student.home.activeBuses'),
                           trailing: _nearbyBuses.isEmpty ? null : '${_nearbyBuses.length}',
                         ),
                         const SizedBox(height: 10),
                         if (_nearbyBuses.isEmpty)
-                          const _EmptyHint(
+                          _EmptyHint(
                             icon: Icons.directions_bus_outlined,
-                            text: 'No buses are on the road right now.',
+                            text: t('student.home.noBuses'),
                           )
                         else
                           ..._nearbyBuses.map(
@@ -115,17 +119,20 @@ class _HomeTabState extends State<HomeTab> {
                               leadingIcon: Icons.directions_bus_filled_rounded,
                               leadingColor: const Color(0xFF0A5796),
                               title: bus.busNumber,
-                              subtitle: '${bus.passengerCount}/${bus.capacity} passengers',
+                              subtitle: AppL10n.of(context).tp('student.home.passengers', {
+                                'count': '${bus.passengerCount}',
+                                'capacity': '${bus.capacity}',
+                              }),
                               trailing: CapacityBadge(state: bus.capacityState),
                             ),
                           ),
                         const SizedBox(height: 22),
-                        const _SectionHeader(title: 'Your favourite routes'),
+                        _SectionHeader(title: t('student.home.favouriteRoutes')),
                         const SizedBox(height: 10),
                         if (_favourites.isEmpty)
-                          const _EmptyHint(
+                          _EmptyHint(
                             icon: Icons.star_border_rounded,
-                            text: 'Star a route from the Routes tab to pin it here.',
+                            text: t('student.home.noFavourites'),
                           )
                         else
                           ..._favourites.map(

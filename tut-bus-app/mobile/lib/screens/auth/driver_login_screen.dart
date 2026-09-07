@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_l10n.dart';
 import '../../services/api_exception.dart';
 import '../../state/auth_state.dart';
 import '../../widgets/auth_backdrop.dart';
@@ -38,7 +39,8 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
       // Clear the auth screens so RootRouter's driver shell becomes visible.
       Navigator.of(context).popUntil((r) => r.isFirst);
     } catch (e) {
-      setState(() => _error = e is ApiException ? e.message : 'Login failed. Please try again.');
+      setState(() => _error =
+          e is ApiException ? e.message : AppL10n.of(context).t('error.loginFailed'));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -46,6 +48,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppL10n.of(context).t;
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.transparent),
       extendBodyBehindAppBar: true,
@@ -57,9 +60,9 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const AuthHeader(
-                  title: 'Driver sign in',
-                  subtitle: 'Accounts are created by transport administrators',
+                AuthHeader(
+                  title: t('auth.driverLogin.title'),
+                  subtitle: t('auth.driverLogin.subtitle'),
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
@@ -67,11 +70,12 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.mail_outline_rounded),
+                  decoration: InputDecoration(
+                    labelText: t('common.email'),
+                    prefixIcon: const Icon(Icons.mail_outline_rounded),
                   ),
-                  validator: (v) => (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
+                  validator: (v) =>
+                      (v == null || !v.contains('@')) ? t('validation.invalidEmail') : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
@@ -79,18 +83,19 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                   obscureText: true,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _submit(),
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock_outline_rounded),
+                  decoration: InputDecoration(
+                    labelText: t('common.password'),
+                    prefixIcon: const Icon(Icons.lock_outline_rounded),
                   ),
-                  validator: (v) => (v == null || v.isEmpty) ? 'Enter your password' : null,
+                  validator: (v) =>
+                      (v == null || v.isEmpty) ? t('validation.passwordRequired') : null,
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 16),
                   _ErrorBanner(message: _error!),
                 ],
                 const SizedBox(height: 20),
-                PrimaryButton(label: 'Sign in', loading: _loading, onPressed: _submit),
+                PrimaryButton(label: t('action.signIn'), loading: _loading, onPressed: _submit),
               ],
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_l10n.dart';
 import '../../services/api_exception.dart';
 import '../../state/auth_state.dart';
 import '../../utils/email_validation.dart';
@@ -41,7 +42,8 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
       // Clear the auth screens so RootRouter's student shell becomes visible.
       Navigator.of(context).popUntil((r) => r.isFirst);
     } catch (e) {
-      setState(() => _error = e is ApiException ? e.message : 'Login failed. Please try again.');
+      setState(() => _error =
+          e is ApiException ? e.message : AppL10n.of(context).t('error.loginFailed'));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -49,6 +51,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppL10n.of(context).t;
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.transparent),
       extendBodyBehindAppBar: true,
@@ -60,9 +63,9 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const AuthHeader(
-                  title: 'Welcome back',
-                  subtitle: 'Sign in with your TUT student email',
+                AuthHeader(
+                  title: t('auth.studentLogin.title'),
+                  subtitle: t('auth.studentLogin.subtitle'),
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
@@ -70,10 +73,10 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'TUT student email',
+                  decoration: InputDecoration(
+                    labelText: t('auth.studentLogin.emailLabel'),
                     hintText: 'yourname@tut4life.ac.za',
-                    prefixIcon: Icon(Icons.mail_outline_rounded),
+                    prefixIcon: const Icon(Icons.mail_outline_rounded),
                   ),
                   validator: validateTutStudentEmail,
                 ),
@@ -83,18 +86,19 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                   obscureText: true,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _submit(),
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock_outline_rounded),
+                  decoration: InputDecoration(
+                    labelText: t('common.password'),
+                    prefixIcon: const Icon(Icons.lock_outline_rounded),
                   ),
-                  validator: (v) => (v == null || v.isEmpty) ? 'Enter your password' : null,
+                  validator: (v) =>
+                      (v == null || v.isEmpty) ? t('validation.passwordRequired') : null,
                 ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () => Navigator.of(context)
                         .push(MaterialPageRoute(builder: (_) => const ForgotPasswordScreen())),
-                    child: const Text('Forgot password?'),
+                    child: Text(t('auth.studentLogin.forgotPassword')),
                   ),
                 ),
                 if (_error != null) ...[
@@ -102,16 +106,16 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                   _ErrorBanner(message: _error!),
                 ],
                 const SizedBox(height: 16),
-                PrimaryButton(label: 'Sign in', loading: _loading, onPressed: _submit),
+                PrimaryButton(label: t('action.signIn'), loading: _loading, onPressed: _submit),
                 const SizedBox(height: 18),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account?", style: TextStyle(color: Color(0xFF8A90A2))),
+                    Text(t('auth.studentLogin.noAccount'), style: const TextStyle(color: Color(0xFF8A90A2))),
                     TextButton(
                       onPressed: () => Navigator.of(context)
                           .push(MaterialPageRoute(builder: (_) => const StudentRegisterScreen())),
-                      child: const Text('Register'),
+                      child: Text(t('action.register')),
                     ),
                   ],
                 ),

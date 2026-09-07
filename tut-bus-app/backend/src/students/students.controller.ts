@@ -58,6 +58,13 @@ export class StudentsController {
     return this.students.tripHistory(user.id);
   }
 
+  @Get('me/stats')
+  @UseGuards(RolesGuard)
+  @Roles(Role.STUDENT)
+  myStats(@CurrentUser() user: AuthenticatedUser) {
+    return this.students.myStats(user.id);
+  }
+
   @Get(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)

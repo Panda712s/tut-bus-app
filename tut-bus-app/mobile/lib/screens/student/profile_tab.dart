@@ -22,6 +22,7 @@ class ProfileTab extends StatefulWidget {
 class _ProfileTabState extends State<ProfileTab> {
   final _repo = StudentRepository();
   StudentProfile? _profile;
+  Map<String, dynamic>? _stats;
   bool _loading = true;
 
   @override
@@ -35,6 +36,12 @@ class _ProfileTabState extends State<ProfileTab> {
     try {
       final profile = await _repo.fetchMyProfile();
       setState(() => _profile = profile);
+      try {
+        final stats = await _repo.fetchMyStats();
+        if (mounted) setState(() => _stats = stats);
+      } catch (_) {
+        // Stats are a nice-to-have; ignore failures so the profile still loads.
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -80,7 +87,32 @@ class _ProfileTabState extends State<ProfileTab> {
                       style: const TextStyle(color: Color(0xFF8A90A2), fontSize: 13),
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _StatTile(
+                          value: '${_stats?['totalTrips'] ?? 0}',
+                          label: 'Trips',
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _StatTile(
+                          value: '${_stats?['tripsThisMonth'] ?? 0}',
+                          label: 'This month',
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _StatTile(
+                          value: '${_stats?['totalMinutesRiding'] ?? 0}',
+                          label: 'Minutes riding',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 22),
                   const _GroupLabel('Account'),
                   _CardGroup(
                     children: [
@@ -134,6 +166,39 @@ class _ProfileTabState extends State<ProfileTab> {
                   ),
                 ],
               ),
+      ),
+    );
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  const _StatTile({required this.value, required this.label});
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF0A5796)),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: Color(0xFF8A90A2)),
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_l10n.dart';
 import '../../models/transport_models.dart';
 import '../../models/user_models.dart';
 import '../../services/driver_repository.dart';
@@ -57,7 +58,9 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
         _activeTrip = active.isNotEmpty ? active.first : null;
       });
     } catch (e) {
-      if (mounted) setState(() => _error = 'Could not load your dashboard.\n$e');
+      if (mounted) {
+        setState(() => _error = '${AppL10n.of(context).t('driver.home.loadError')}\n$e');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -75,7 +78,9 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
       _load();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not start trip: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppL10n.of(context).tp('driver.home.startTripError', {'error': '$e'})),
+        ));
       }
     } finally {
       if (mounted) setState(() => _starting = false);
@@ -84,11 +89,12 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppL10n.of(context).t;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Driver Dashboard'),
+        title: Text(t('driver.home.title')),
         actions: [
-          IconButton(onPressed: _load, icon: const Icon(Icons.refresh_rounded), tooltip: 'Refresh'),
+          IconButton(onPressed: _load, icon: const Icon(Icons.refresh_rounded), tooltip: t('common.refresh')),
         ],
       ),
       body: TutBackground(
@@ -112,13 +118,15 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Hi, ${_profile?.fullName.split(' ').first ?? 'Driver'} 👋',
+                                      AppL10n.of(context).tp('driver.home.greeting', {
+                                        'name': _profile?.fullName.split(' ').first ?? t('driver.home.someone'),
+                                      }),
                                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.4),
                                     ),
                                     const SizedBox(height: 4),
-                                    const Text(
-                                      "Here's your shift for today.",
-                                      style: TextStyle(color: _muted, fontSize: 13.5),
+                                    Text(
+                                      t('driver.home.subtitle'),
+                                      style: const TextStyle(color: _muted, fontSize: 13.5),
                                     ),
                                   ],
                                 ),
@@ -127,7 +135,7 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                             ],
                           ),
                           const SizedBox(height: 20),
-                          const WeatherCard(footer: 'Clear roads reported on your route.'),
+                          WeatherCard(footer: t('driver.home.weatherFooter')),
                           const SizedBox(height: 22),
                           AnimatedSwitcher(
                             duration: const Duration(milliseconds: 280),

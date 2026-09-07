@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/app_l10n.dart';
 import '../../models/transport_models.dart';
 import '../../services/transport_repository.dart';
 import '../../widgets/state_views.dart';
@@ -43,7 +44,7 @@ class _RoutesTabState extends State<RoutesTab> {
       final routes = await _repo.fetchRoutes(search: search);
       setState(() => _routes = routes);
     } catch (_) {
-      setState(() => _error = 'Could not load routes.');
+      setState(() => _error = AppL10n.of(context).t('student.routes.loadError'));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -56,8 +57,9 @@ class _RoutesTabState extends State<RoutesTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppL10n.of(context).t;
     return Scaffold(
-      appBar: AppBar(title: const Text('Bus Routes')),
+      appBar: AppBar(title: Text(t('student.routes.title'))),
       body: TutBackground(
         child: Column(
         children: [
@@ -66,9 +68,9 @@ class _RoutesTabState extends State<RoutesTab> {
             child: TextField(
               controller: _searchController,
               onChanged: _onSearchChanged,
-              decoration: const InputDecoration(
-                hintText: 'Search by campus, route or destination',
-                prefixIcon: Icon(Icons.search_rounded),
+              decoration: InputDecoration(
+                hintText: t('student.routes.searchHint'),
+                prefixIcon: const Icon(Icons.search_rounded),
               ),
             ),
           ),
@@ -78,7 +80,7 @@ class _RoutesTabState extends State<RoutesTab> {
                 : _error != null
                     ? ErrorView(message: _error!, onRetry: () => _load(_searchController.text))
                     : _routes.isEmpty
-                        ? const EmptyView(message: 'No routes match your search.', icon: Icons.alt_route_outlined)
+                        ? EmptyView(message: t('student.routes.empty'), icon: Icons.alt_route_outlined)
                         : ListView.separated(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             itemCount: _routes.length,
@@ -90,7 +92,10 @@ class _RoutesTabState extends State<RoutesTab> {
                                   title: Text(route.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                                   subtitle: Text('${route.origin} → ${route.destination}'),
                                   trailing: route.estimatedDurationMin != null
-                                      ? Text('${route.estimatedDurationMin} min', style: TextStyle(color: Color(0xFF8A90A2)))
+                                      ? Text(
+                                          AppL10n.of(context).tp('student.routes.durationMin',
+                                              {'min': '${route.estimatedDurationMin}'}),
+                                          style: const TextStyle(color: Color(0xFF8A90A2)))
                                       : null,
                                   onTap: () => Navigator.of(context)
                                       .push(MaterialPageRoute(builder: (_) => RouteDetailScreen(routeId: route.id))),

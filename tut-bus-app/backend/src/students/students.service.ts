@@ -123,6 +123,30 @@ export class StudentsService {
     });
   }
 
+  async myStats(studentId: string) {
+    const completedTrips = await this.prisma.tripHistory.findMany({
+      where: { studentId, alightedAt: { not: null } },
+    });
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    let totalMinutesRiding = 0;
+    let tripsThisMonth = 0;
+
+    for (const trip of completedTrips) {
+      if (trip.boardedAt >= startOfMonth) tripsThisMonth += 1;
+      const alightedAt = trip.alightedAt as Date;
+      totalMinutesRiding += (alightedAt.getTime() - trip.boardedAt.getTime()) / 60000;
+    }
+
+    return {
+      totalTrips: completedTrips.length,
+      tripsThisMonth,
+      totalMinutesRiding: Math.round(totalMinutesRiding),
+    };
+  }
+
   async ensureSelfOrAdmin(requesterId: string, requesterRole: string, targetId: string) {
     if (requesterRole === 'ADMIN') return;
     if (requesterId !== targetId) throw new ForbiddenException('You may only access your own data');

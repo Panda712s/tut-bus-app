@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_l10n.dart';
 import '../../widgets/auth_backdrop.dart';
 import 'student_login_screen.dart';
 import 'driver_login_screen.dart';
@@ -8,22 +9,23 @@ class RoleSelectScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppL10n.of(context).t;
     return Scaffold(
       body: AuthBackdrop(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 48, 24, 32),
           child: Column(
             children: [
-              const AuthHeader(
+              AuthHeader(
                 title: 'TUT Bus App',
-                subtitle: 'Smart Campus Bus Tracking and Management System',
+                subtitle: t('auth.roleSelect.subtitle'),
                 logoHeight: 72,
               ),
               const SizedBox(height: 44),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'CONTINUE AS',
+                  t('auth.roleSelect.continueAs'),
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -34,23 +36,23 @@ class RoleSelectScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               _RoleCard(
-                title: 'Student',
-                subtitle: 'Track buses, view schedules, get notified',
+                title: t('auth.roleSelect.student.title'),
+                subtitle: t('auth.roleSelect.student.subtitle'),
                 icon: Icons.school_rounded,
                 onTap: () => Navigator.of(context)
                     .push(MaterialPageRoute(builder: (_) => const StudentLoginScreen())),
               ),
               const SizedBox(height: 14),
               _RoleCard(
-                title: 'Driver',
-                subtitle: 'Start trips and share your live location',
+                title: t('auth.roleSelect.driver.title'),
+                subtitle: t('auth.roleSelect.driver.subtitle'),
                 icon: Icons.airport_shuttle_rounded,
                 onTap: () => Navigator.of(context)
                     .push(MaterialPageRoute(builder: (_) => const DriverLoginScreen())),
               ),
               const SizedBox(height: 32),
               Text(
-                'Administrators sign in on the web dashboard',
+                t('auth.roleSelect.adminNote'),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
               ),

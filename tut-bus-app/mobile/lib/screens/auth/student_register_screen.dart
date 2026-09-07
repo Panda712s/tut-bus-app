@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_l10n.dart';
 import '../../services/api_exception.dart';
 import '../../state/auth_state.dart';
 import '../../utils/email_validation.dart';
@@ -60,7 +61,8 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
         );
       }
     } catch (e) {
-      setState(() => _error = e is ApiException ? e.message : 'Registration failed. Please try again.');
+      setState(() => _error =
+          e is ApiException ? e.message : AppL10n.of(context).t('error.registrationFailed'));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -68,6 +70,7 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppL10n.of(context).t;
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.transparent),
       extendBodyBehindAppBar: true,
@@ -79,31 +82,31 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const AuthHeader(
-                  title: 'Create your account',
-                  subtitle: 'Register with your TUT student email to start tracking campus buses',
+                AuthHeader(
+                  title: t('auth.studentRegister.title'),
+                  subtitle: t('auth.studentRegister.subtitle'),
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
                   controller: _studentNumberController,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Student number',
-                    prefixIcon: Icon(Icons.badge_outlined),
+                  decoration: InputDecoration(
+                    labelText: t('auth.studentRegister.studentNumber'),
+                    prefixIcon: const Icon(Icons.badge_outlined),
                   ),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty) ? t('common.required') : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _fullNameController,
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Full name',
-                    prefixIcon: Icon(Icons.person_outline_rounded),
+                  decoration: InputDecoration(
+                    labelText: t('auth.studentRegister.fullName'),
+                    prefixIcon: const Icon(Icons.person_outline_rounded),
                   ),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty) ? t('common.required') : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
@@ -111,10 +114,10 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'TUT student email',
+                  decoration: InputDecoration(
+                    labelText: t('auth.studentLogin.emailLabel'),
                     hintText: 'yourname@tut4life.ac.za',
-                    prefixIcon: Icon(Icons.mail_outline_rounded),
+                    prefixIcon: const Icon(Icons.mail_outline_rounded),
                   ),
                   validator: validateTutStudentEmail,
                 ),
@@ -124,15 +127,16 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                   obscureText: _obscure,
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
-                    labelText: 'Password',
-                    helperText: 'At least 8 characters',
+                    labelText: t('common.password'),
+                    helperText: t('auth.studentRegister.passwordMin'),
                     prefixIcon: const Icon(Icons.lock_outline_rounded),
                     suffixIcon: IconButton(
                       onPressed: () => setState(() => _obscure = !_obscure),
                       icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined),
                     ),
                   ),
-                  validator: (v) => (v == null || v.length < 8) ? 'At least 8 characters' : null,
+                  validator: (v) =>
+                      (v == null || v.length < 8) ? t('auth.studentRegister.passwordMin') : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
@@ -140,9 +144,9 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _submit(),
-                  decoration: const InputDecoration(
-                    labelText: 'Phone (optional)',
-                    prefixIcon: Icon(Icons.phone_outlined),
+                  decoration: InputDecoration(
+                    labelText: t('auth.studentRegister.phone'),
+                    prefixIcon: const Icon(Icons.phone_outlined),
                   ),
                 ),
                 if (_error != null) ...[
@@ -150,15 +154,15 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                   _ErrorBanner(message: _error!),
                 ],
                 const SizedBox(height: 22),
-                PrimaryButton(label: 'Create account', loading: _loading, onPressed: _submit),
+                PrimaryButton(label: t('action.createAccount'), loading: _loading, onPressed: _submit),
                 const SizedBox(height: 14),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already registered?', style: TextStyle(color: Color(0xFF8A90A2))),
+                    Text(t('auth.studentRegister.alreadyRegistered'), style: const TextStyle(color: Color(0xFF8A90A2))),
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Sign in'),
+                      child: Text(t('action.signIn')),
                     ),
                   ],
                 ),
