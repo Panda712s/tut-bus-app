@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_l10n.dart';
 import '../../services/api_exception.dart';
+import '../../services/remembered_credentials.dart';
 import '../../state/auth_state.dart';
 import '../../widgets/auth_backdrop.dart';
 import '../../widgets/primary_button.dart';
+import '../../widgets/remember_me_toggle.dart';
 
 class DriverLoginScreen extends StatefulWidget {
   const DriverLoginScreen({super.key});
@@ -14,11 +16,27 @@ class DriverLoginScreen extends StatefulWidget {
 }
 
 class _DriverLoginScreenState extends State<DriverLoginScreen> {
+  static const _role = 'driver';
+
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _remembered = RememberedCredentials();
   bool _loading = false;
+  bool _remember = true;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _remembered.load(_role).then((saved) {
+      if (saved == null || !mounted) return;
+      setState(() {
+        _emailController.text = saved.email;
+        _passwordController.text = saved.password;
+      });
+    });
+  }
 
   @override
   void dispose() {
@@ -34,7 +52,14 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
       _error = null;
     });
     try {
-      await context.read<AuthState>().signInDriver(_emailController.text.trim(), _passwordController.text);
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+      await context.read<AuthState>().signInDriver(email, password);
+      if (_remember) {
+        await _remembered.save(role: _role, email: email, password: password);
+      } else {
+        await _remembered.clear(_role);
+      }
       if (!mounted) return;
       // Clear the auth screens so RootRouter's driver shell becomes visible.
       Navigator.of(context).popUntil((r) => r.isFirst);
@@ -89,6 +114,14 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                   ),
                   validator: (v) =>
                       (v == null || v.isEmpty) ? t('validation.passwordRequired') : null,
+                ),
+                const SizedBox(height: 6),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: RememberMeToggle(
+                    value: _remember,
+                    onChanged: (v) => setState(() => _remember = v),
+                  ),
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 16),

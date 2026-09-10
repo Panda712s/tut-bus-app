@@ -45,7 +45,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                   separatorBuilder: (_, __) => const Divider(height: 1),
                   itemBuilder: (context, index) {
                     final e = _entries[index];
-                    final duration = e.alightedAt != null ? e.alightedAt!.difference(e.boardedAt) : null;
+                    final duration = e.alightedAt?.difference(e.boardedAt);
                     return ListTile(
                       leading: const Icon(Icons.directions_bus_filled_rounded, color: Color(0xFF0A5796)),
                       title: Text(e.routeName ?? 'Trip'),

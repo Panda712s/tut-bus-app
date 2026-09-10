@@ -64,7 +64,7 @@ class _StudentShellState extends State<StudentShell> {
       body: Stack(
         children: [
           IndexedStack(index: _index, children: _tabs),
-          Positioned(right: 16, bottom: 16, child: SafeArea(child: SosButton(compact: true))),
+          const Positioned(right: 16, bottom: 16, child: SafeArea(child: SosButton(compact: true))),
         ],
       ),
       bottomNavigationBar: NavigationBar(

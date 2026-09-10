@@ -1,16 +1,31 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, ApiError, setStoredUser, setTokens } from '@/lib/api';
 import type { AuthResponse } from '@/lib/types';
+
+const REMEMBER_KEY = 'tutbus_remember_admin';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('admin@tut.ac.za');
   const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(REMEMBER_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as { email?: string; password?: string };
+      if (saved.email) setEmail(saved.email);
+      if (saved.password) setPassword(atob(saved.password));
+    } catch {
+      /* ignore malformed / unavailable storage */
+    }
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -20,6 +35,15 @@ export default function LoginPage() {
       const res = await api.post<AuthResponse>('/auth/admin/login', { email, password });
       setTokens(res.accessToken, res.refreshToken);
       setStoredUser(res.user);
+      try {
+        if (remember) {
+          localStorage.setItem(REMEMBER_KEY, JSON.stringify({ email, password: btoa(password) }));
+        } else {
+          localStorage.removeItem(REMEMBER_KEY);
+        }
+      } catch {
+        /* storage unavailable - not fatal */
+      }
       router.push('/');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
@@ -73,6 +97,16 @@ export default function LoginPage() {
               placeholder="••••••••"
             />
           </div>
+
+          <label className="flex cursor-pointer select-none items-center gap-2.5 text-sm text-ink-muted">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="h-4 w-4 rounded border-line text-accent focus:ring-2 focus:ring-accent/25"
+            />
+            Remember my details
+          </label>
 
           {error && (
             <p className="rounded-xl bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-400/25">

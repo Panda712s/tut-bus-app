@@ -139,13 +139,14 @@ class _ThemeOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadioListTile<ThemeMode>(
-      value: value,
-      groupValue: groupValue,
-      onChanged: (v) => v == null ? null : onChanged(v),
-      controlAffinity: ListTileControlAffinity.trailing,
-      secondary: Icon(icon),
+    final selected = value == groupValue;
+    return ListTile(
+      onTap: () => onChanged(value),
+      leading: Icon(icon),
       title: Text(label),
+      trailing: selected
+          ? const Icon(Icons.check_rounded, color: AppColors.accent)
+          : null,
     );
   }
 }

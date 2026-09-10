@@ -101,6 +101,7 @@ class AppL10n {
       'validation.passwordRequired': 'Enter your password',
       'auth.driverLogin.title': 'Driver sign in',
       'auth.driverLogin.subtitle': 'Accounts are created by transport administrators',
+      'auth.rememberMe': 'Remember my details',
       'validation.invalidEmail': 'Enter a valid email',
       'auth.studentRegister.title': 'Create your account',
       'auth.studentRegister.subtitle':
@@ -182,6 +183,7 @@ class AppL10n {
       'validation.passwordRequired': 'Voer jou wagwoord in',
       'auth.driverLogin.title': 'Bestuurder-aanmelding',
       'auth.driverLogin.subtitle': 'Rekeninge word deur vervoeradministrateurs geskep',
+      'auth.rememberMe': 'Onthou my besonderhede',
       'validation.invalidEmail': "Voer 'n geldige e-posadres in",
       'auth.studentRegister.title': 'Skep jou rekening',
       'auth.studentRegister.subtitle':
@@ -264,6 +266,7 @@ class AppL10n {
       'validation.passwordRequired': 'Faka iphasiwedi yakho',
       'auth.driverLogin.title': 'Ukungena komshayeli',
       'auth.driverLogin.subtitle': 'Ama-akhawunti enziwa ngabaphathi bezokuthutha',
+      'auth.rememberMe': 'Khumbula imininingwane yami',
       'validation.invalidEmail': 'Faka i-imeyili esebenzayo',
       'auth.studentRegister.title': 'Dala i-akhawunti yakho',
       'auth.studentRegister.subtitle':
@@ -346,6 +349,7 @@ class AppL10n {
       'validation.passwordRequired': 'Faka iphasiwedi yakho',
       'auth.driverLogin.title': 'Ukungena komqhubi',
       'auth.driverLogin.subtitle': 'Ii-akhawunti zenziwa ngabalawuli bezothutho',
+      'auth.rememberMe': 'Khumbula iinkcukacha zam',
       'validation.invalidEmail': 'Faka i-imeyile esebenzayo',
       'auth.studentRegister.title': 'Yenza i-akhawunti yakho',
       'auth.studentRegister.subtitle':
@@ -428,6 +432,7 @@ class AppL10n {
       'validation.passwordRequired': 'Kenya phasewete ya hao',
       'auth.driverLogin.title': 'Ho kena ha mokgweetsi',
       'auth.driverLogin.subtitle': 'Diakhaonto di etswa ke batsamaisi ba dipalangwang',
+      'auth.rememberMe': 'Hopola dintlha tsa ka',
       'validation.invalidEmail': 'Kenya imeile e nepahetseng',
       'auth.studentRegister.title': 'Theha akhaonto ya hao',
       'auth.studentRegister.subtitle':

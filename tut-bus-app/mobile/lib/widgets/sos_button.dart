@@ -45,7 +45,7 @@ class _SosButtonState extends State<SosButton> {
     double? lng;
     try {
       final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       ).timeout(const Duration(seconds: 5));
       lat = pos.latitude;
       lng = pos.longitude;
@@ -82,9 +82,9 @@ class _SosButtonState extends State<SosButton> {
             height: 18,
             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
           )
-        : Row(
+        : const Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Icon(Icons.sos_rounded, size: 18, color: Colors.white),
               SizedBox(width: 6),
               Text('SOS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
