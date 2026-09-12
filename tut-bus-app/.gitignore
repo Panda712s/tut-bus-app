@@ -28,6 +28,9 @@ mobile/android/.gradle/
 .DS_Store
 Thumbs.db
 
+# Stray local JDK extraction - never belongs in the repo
+backend/oracleJdk-26/
+
 # IDE
 .vscode/
 .idea/

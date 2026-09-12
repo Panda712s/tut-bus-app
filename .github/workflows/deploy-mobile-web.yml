@@ -1,0 +1,56 @@
+name: Deploy student/driver web app to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tut-bus-app/mobile/**'
+      - '.github/workflows/deploy-mobile-web.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        working-directory: tut-bus-app/mobile
+        run: flutter pub get
+
+      - name: Build web
+        working-directory: tut-bus-app/mobile
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+          SOCKET_BASE_URL: ${{ vars.SOCKET_BASE_URL }}
+        run: |
+          flutter build web \
+            --release \
+            --pwa-strategy=none \
+            --base-href /tut-bus-app/ \
+            --dart-define=API_BASE_URL="$API_BASE_URL" \
+            --dart-define=SOCKET_BASE_URL="$SOCKET_BASE_URL" \
+            --dart-define=GOOGLE_MAPS_API_KEY="${{ secrets.GOOGLE_MAPS_API_KEY }}"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: tut-bus-app/mobile/build/web
+
+      - uses: actions/deploy-pages@v4
+        id: deployment
